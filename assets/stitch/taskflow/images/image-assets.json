@@ -1,0 +1,50 @@
+{
+  "assets": [
+    {
+      "file": "alexa-profile.jpg",
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuDJogtU52hnElKTHxSE7G7EAjozCfdoKdHfg0Ez8mjChYePom5zXV4KCUHn8DJOp_6FdB0b_bHWPEnlOlHwfmIpIxQMbG0YS4rPIGD59qvbmjn7UEeorvGpFUeWccv9rNeqVfjcRPKykb9dbbVTiAWguIIXV-pvBc9X2aA6eehC0AlkhWs79LquuJ6r_WzaBymeN0n4JjH9RseLDCU1cP0v9tVpMCMRwtm6xsF3KtVB",
+      "alt": "Profile portrait",
+      "usedIn": [
+        "Profile Screen",
+        "Add Task Screen",
+        "Calendar Screen",
+        "All Tasks Screen",
+        "Home Dashboard",
+        "Statistics Screen"
+      ]
+    },
+    {
+      "file": "scandinavian-desk.jpg",
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCQdq5eqQKYqep0lnqi-EdDm7s8rpn2gEzttJuomMBawuuoXBYJMdvDn8aXboC1CeeIpfe0M19Q0apLF-U9BAAjeVPlivzTFTQewH0a23eR-t1cD3ZYH184KL6bK3aTQ6MMOIEdKnOJKG5_WJXOi8wRRuKSGJdRS6QD0TE52Sai7FrFDkYFBp2OOxCTzxMQs7ZoNxgDatKYF7jDH_BRF7hl3J87EJeOAXoHaLVfUphR",
+      "alt": "Clean Scandinavian desk setup with purple notebook and laptop",
+      "usedIn": [
+        "Add Task Screen"
+      ]
+    },
+    {
+      "file": "alexa-dashboard.jpg",
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuC_sqDkQUQvXq4ojLFXKZVeTPPxxliOi0QqbObQONuxwtdw99hRQtAfXYB2q9EI1OF888DKQeeVJgGaQclcWMMq_pK0BGEtlTPjNUfjLC4-w6jJbSYl4JnYpciMj3ye7RC51jZ_WuLNiPfyaAWLPPnmaEea98RlPPmyzHPTCaUwPvUTOfZaet18khL2DS7x_yQKe_BIwC8qtLH_5oG9x_NcYlqnCbc9zoVEb4YurMuc",
+      "alt": "Alexa portrait",
+      "usedIn": [
+        "Home Dashboard"
+      ]
+    },
+    {
+      "file": null,
+      "sourceUrl": "https://lh3.googleusercontent.com/aida/ALJJyrDBLTcJLwN-PFDBmT8SgyY-h_I_TaMaKU-0yEYWoNBxkxyZ2SYHlsgnqriDWU643_lOCBDe7jipEujZPuAp_O4QIbts8WrDRDPCK_nPq5uRoPDxiZOA2Q_nRH2Y0YsQvRDKOiVkuaKbKfSV3vI1m8SDai0tPIrr6FOi0z2yIKSLaYp5MZgOiEzYwbKaUO2IyZ2mxT9Nq-DTQra0_Zk2IrLHz3hgVW6ZBybSsBSOVCyG",
+      "alt": "TaskFlow Logo",
+      "usedIn": [
+        "Profile Screen",
+        "Splash Screen",
+        "Add Task Screen",
+        "Calendar Screen",
+        "All Tasks Screen",
+        "Login Screen",
+        "Home Dashboard",
+        "Statistics Screen"
+      ],
+      "status": "not downloaded",
+      "reason": "The image URL returned a Google Accounts sign-in HTML page instead of image bytes. No image file was saved."
+    }
+  ]
+}

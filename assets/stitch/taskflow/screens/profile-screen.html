@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><title>TaskFlow</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary-container": "#675df9", "surface-bright": "#fcf8ff", "on-primary-container": "#fffbff", "surface-container-high": "#e9e5ff", "on-primary-fixed": "#100069", "on-secondary-container": "#fffbff", "tertiary-container": "#00855b", "outline": "#777587", "on-error-container": "#93000a", "on-tertiary-fixed": "#002113", "surface-container": "#efebff", "inverse-primary": "#c4c0ff", "surface-variant": "#e3dfff", "on-tertiary-fixed-variant": "#005236", "on-secondary-fixed": "#0f0069", "inverse-surface": "#2d2a5b", "secondary-fixed": "#e2dfff", "secondary-fixed-dim": "#c3c0ff", "outline-variant": "#c7c4d8", "primary-fixed-dim": "#c4c0ff", "on-secondary": "#ffffff", "surface": "#fcf8ff", "primary": "#4d41df", "surface-container-low": "#f6f2ff", "background": "#fcf8ff", "on-primary": "#ffffff", "surface-tint": "#4f44e2", "tertiary-fixed": "#6ffbbe", "on-surface-variant": "#464555", "surface-container-highest": "#e3dfff", "tertiary-fixed-dim": "#4edea3", "on-primary-fixed-variant": "#3622ca", "on-tertiary-container": "#f5fff6", "on-secondary-fixed-variant": "#3323cc", "on-tertiary": "#ffffff", "on-background": "#181445", "error": "#ba1a1a", "secondary-container": "#645efb", "error-container": "#ffdad6", "surface-container-lowest": "#ffffff", "tertiary": "#006947", "primary-fixed": "#e3dfff", "on-error": "#ffffff", "surface-dim": "#dad6ff", "on-surface": "#181445", "secondary": "#4b41e1", "inverse-on-surface": "#f3eeff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "space-xs": "0.25rem", "gutter": "1rem", "space-lg": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "space-xl": "2rem" }, fontFamily: { "headline-lg": ["Inter"], "body-md": ["Inter"], "headline-lg-mobile": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Inter"], "title-md": ["Inter"], "title-lg": ["Inter"] }, fontSize: { "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "display-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "500" }], "title-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#fcf8ff;color:#181445;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="w-full flex items-center justify-between px-space-md pt-2 pb-1 text-on-surface"><span class="font-label-sm text-label-sm font-semibold tracking-wide">9:41</span><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">signal_cellular_4_bar</span><span class="material-symbols-outlined text-[15px]">wifi</span><span class="material-symbols-outlined text-[15px]">battery_full</span></div></div><div class="h-16 px-space-md flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="TaskFlow Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrDBLTcJLwN-PFDBmT8SgyY-h_I_TaMaKU-0yEYWoNBxkxyZ2SYHlsgnqriDWU643_lOCBDe7jipEujZPuAp_O4QIbts8WrDRDPCK_nPq5uRoPDxiZOA2Q_nRH2Y0YsQvRDKOiVkuaKbKfSV3vI1m8SDai0tPIrr6FOi0z2yIKSLaYp5MZgOiEzYwbKaUO2IyZ2mxT9Nq-DTQra0_Zk2IrLHz3hgVW6ZBybSsBSOVCyG"/><div class="flex flex-col"><span class="font-title-lg text-title-lg text-primary tracking-tight">TaskFlow</span><span class="font-label-sm text-label-sm text-on-surface-variant line-clamp-1">Profile</span></div></div><div class="flex items-center gap-1"><button aria-label="Search" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all" type="button"><span class="material-symbols-outlined text-[22px]">search</span></button><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span></button><a aria-label="View Profile" class="w-11 h-11 flex items-center justify-center rounded-full active:scale-95 transition-all ml-1" data-path="profile" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJogtU52hnElKTHxSE7G7EAjozCfdoKdHfg0Ez8mjChYePom5zXV4KCUHn8DJOp_6FdB0b_bHWPEnlOlHwfmIpIxQMbG0YS4rPIGD59qvbmjn7UEeorvGpFUeWccv9rNeqVfjcRPKykb9dbbVTiAWguIIXV-pvBc9X2aA6eehC0AlkhWs79LquuJ6r_WzaBymeN0n4JjH9RseLDCU1cP0v9tVpMCMRwtm6xsF3KtVB"/></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-[92px] pb-[88px] bg-surface"><div class="flex flex-col w-full px-space-md gap-y-4 pb-12">
+<!-- Profile Hero Bento Card -->
+<section class="w-full bg-surface-container-lowest rounded-2xl p-space-md shadow-[0_2px_12px_-2px_rgba(30,27,75,0.06),0_1px_4px_0_rgba(30,27,75,0.02)] flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute -right-12 -top-12 w-44 h-44 rounded-full bg-primary/5 pointer-events-none blur-2xl"></div>
+<!-- User Header & Status -->
+<div class="flex items-center gap-4 relative z-10">
+<div class="relative">
+<img alt="Alexa Chen profile photo" class="w-18 h-18 w-[72px] h-[72px] rounded-full object-cover shadow-sm ring-4 ring-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJogtU52hnElKTHxSE7G7EAjozCfdoKdHfg0Ez8mjChYePom5zXV4KCUHn8DJOp_6FdB0b_bHWPEnlOlHwfmIpIxQMbG0YS4rPIGD59qvbmjn7UEeorvGpFUeWccv9rNeqVfjcRPKykb9dbbVTiAWguIIXV-pvBc9X2aA6eehC0AlkhWs79LquuJ6r_WzaBymeN0n4JjH9RseLDCU1cP0v9tVpMCMRwtm6xsF3KtVB"/>
+<button aria-label="Change profile photo" class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+</button>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-2 flex-wrap">
+<h1 class="font-title-lg text-title-lg text-on-surface font-semibold tracking-tight truncate">Alexa Chen</h1>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold tracking-wide">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+            Pro
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">alexa.chen@flow.design</p>
+<div class="mt-1.5 flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]">workspace_premium</span>
+<span class="font-label-sm text-label-sm font-medium tracking-tight">TaskFlow Pro • Annual</span>
+</div>
+</div>
+</div>
+<!-- Quick Stats Metric Bar -->
+<div class="grid grid-cols-3 gap-2 pt-3 border-t-0 bg-surface-container-low rounded-xl p-3">
+<div class="flex flex-col items-center justify-center text-center">
+<span class="font-title-lg text-title-lg text-primary font-bold">142</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Completed</span>
+</div>
+<div class="flex flex-col items-center justify-center text-center border-x-0 bg-surface-container-lowest/60 rounded-lg py-1 shadow-sm">
+<div class="flex items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-title-lg text-title-lg font-bold">12</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Day Streak</span>
+</div>
+<div class="flex flex-col items-center justify-center text-center">
+<span class="font-title-lg text-title-lg text-tertiary font-bold">98%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">On-time</span>
+</div>
+</div>
+</section>
+<!-- Preferences Section -->
+<section class="flex flex-col gap-2">
+<div class="flex items-center px-1">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold uppercase tracking-wider">Preferences</span>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-2xl shadow-[0_2px_8px_-2px_rgba(30,27,75,0.04)] overflow-hidden">
+<!-- Dark Mode Toggle -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">dark_mode</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Dark Mode</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Off • Light Lavender theme</span>
+</div>
+</div>
+<button aria-checked="false" class="w-12 h-7 rounded-full bg-surface-variant p-0.5 transition-colors duration-200 relative focus:outline-none" id="toggle-dark" role="switch" type="button">
+<span class="block w-6 h-6 rounded-full bg-surface-container-lowest shadow-sm transform transition-transform duration-200 translate-x-0"></span>
+</button>
+</div>
+<!-- Push Notifications Toggle -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Push Notifications</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Daily digest &amp; due date alerts</span>
+</div>
+</div>
+<button aria-checked="true" class="w-12 h-7 rounded-full bg-primary p-0.5 transition-colors duration-200 relative focus:outline-none" id="toggle-notifications" role="switch" type="button">
+<span class="block w-6 h-6 rounded-full bg-on-primary shadow-sm transform transition-transform duration-200 translate-x-5"></span>
+</button>
+</div>
+<!-- Sound & Haptic Feedback Toggle -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">vibration</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Sound &amp; Haptic</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tactile touch ticks &amp; chimes</span>
+</div>
+</div>
+<button aria-checked="true" class="w-12 h-7 rounded-full bg-primary p-0.5 transition-colors duration-200 relative focus:outline-none" id="toggle-haptic" role="switch" type="button">
+<span class="block w-6 h-6 rounded-full bg-on-primary shadow-sm transform transition-transform duration-200 translate-x-5"></span>
+</button>
+</div>
+<!-- Default Task Priority Dropdown -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">flag</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Default Priority</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Assigned upon fast creation</span>
+</div>
+</div>
+<div class="relative">
+<select class="appearance-none bg-surface-container-low text-on-surface font-label-md text-label-md font-semibold py-1.5 pl-3 pr-8 rounded-full focus:outline-none active:bg-surface-container-high transition-colors">
+<option value="Low">Low</option>
+<option selected="" value="Medium">Medium</option>
+<option value="High">High</option>
+<option value="Urgent">Urgent</option>
+</select>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant pointer-events-none absolute right-2 top-2">expand_more</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Integrations Section -->
+<section class="flex flex-col gap-2">
+<div class="flex items-center px-1">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold uppercase tracking-wider">Data &amp; Integrations</span>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-2xl shadow-[0_2px_8px_-2px_rgba(30,27,75,0.04)] overflow-hidden">
+<!-- Google Calendar Sync -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-tertiary-container/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">event_repeat</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Google Calendar Sync</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Live bi-directional sync</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+          Connected
+        </span>
+</div>
+<!-- Export Task Archive -->
+<button class="w-full flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors text-left active:bg-surface-container" type="button">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Export Task Archive</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Download all tasks as CSV or JSON</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Support & About Section -->
+<section class="flex flex-col gap-2">
+<div class="flex items-center px-1">
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold uppercase tracking-wider">Support &amp; About</span>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-2xl shadow-[0_2px_8px_-2px_rgba(30,27,75,0.04)] overflow-hidden">
+<!-- Help Center -->
+<a class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors" href="#">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">help_center</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Help Center &amp; Tutorials</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Guides, keyboard shortcuts &amp; tips</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">arrow_outward</span>
+</a>
+<!-- Terms & Privacy -->
+<a class="flex items-center justify-between p-space-md hover:bg-surface-container-low/50 transition-colors" href="#">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">policy</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface font-medium">Terms &amp; Privacy Policy</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">GDPR compliance &amp; legal terms</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">chevron_right</span>
+</a>
+<!-- App Version -->
+<div class="flex items-center justify-between p-space-md">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<span class="font-title-md text-title-md text-on-surface font-medium">App Version</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full font-mono">2.4.0 (Build 182)</span>
+</div>
+</div>
+</section>
+<!-- Danger Zone / Log Out Action -->
+<section class="mt-2">
+<button class="w-full bg-error-container/40 hover:bg-error-container/60 active:scale-[0.99] transition-all rounded-2xl p-space-md flex items-center justify-center gap-2.5 text-error shadow-sm" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="font-title-md text-title-md font-semibold">Log Out of TaskFlow</span>
+</button>
+</section>
+</div>
+<script>
+  // Simple accessible toggle behaviors
+  const toggles = [
+    { id: 'toggle-dark', activeBg: 'bg-primary', inactiveBg: 'bg-surface-variant' },
+    { id: 'toggle-notifications', activeBg: 'bg-primary', inactiveBg: 'bg-surface-variant' },
+    { id: 'toggle-haptic', activeBg: 'bg-primary', inactiveBg: 'bg-surface-variant' }
+  ];
+
+  toggles.forEach(t => {
+    const el = document.getElementById(t.id);
+    if (!el) return;
+    el.addEventListener('click', () => {
+      const isChecked = el.getAttribute('aria-checked') === 'true';
+      const newState = !isChecked;
+      el.setAttribute('aria-checked', String(newState));
+      
+      const thumb = el.querySelector('span');
+      if (newState) {
+        el.classList.remove(t.inactiveBg);
+        el.classList.add(t.activeBg);
+        thumb.classList.remove('translate-x-0', 'bg-surface-container-lowest');
+        thumb.classList.add('translate-x-5', 'bg-on-primary');
+      } else {
+        el.classList.remove(t.activeBg);
+        el.classList.add(t.inactiveBg);
+        thumb.classList.remove('translate-x-5', 'bg-on-primary');
+        thumb.classList.add('translate-x-0', 'bg-surface-container-lowest');
+      }
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.03)]" data-active-classes="text-primary font-semibold [&amp;_div]:bg-surface-container-high [&amp;_span.material-symbols-outlined]:fill-1"><div class="h-20 px-space-sm flex items-center justify-around"><a class="flex-1 min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-on-surface group transition-colors" data-path="home" href="#"><div class="w-16 h-8 rounded-full flex items-center justify-center transition-colors group-active:scale-95"><span class="material-symbols-outlined text-[24px]">home</span></div><span class="font-label-sm text-label-sm tracking-tight">Home</span></a><a class="flex-1 min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-on-surface group transition-colors" data-path="tasks" href="#"><div class="w-16 h-8 rounded-full flex items-center justify-center transition-colors group-active:scale-95"><span class="material-symbols-outlined text-[24px]">check_circle</span></div><span class="font-label-sm text-label-sm tracking-tight">Tasks</span></a><a class="flex-1 min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-on-surface group transition-colors" data-path="calendar" href="#"><div class="w-16 h-8 rounded-full flex items-center justify-center transition-colors group-active:scale-95"><span class="material-symbols-outlined text-[24px]">calendar_today</span></div><span class="font-label-sm text-label-sm tracking-tight">Calendar</span></a><a class="flex-1 min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-on-surface group transition-colors" data-path="statistics" href="#"><div class="w-16 h-8 rounded-full flex items-center justify-center transition-colors group-active:scale-95"><span class="material-symbols-outlined text-[24px]">analytics</span></div><span class="font-label-sm text-label-sm tracking-tight">Statistics</span></a><a aria-current="page" class="flex-1 min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 group transition-colors text-primary font-semibold [&amp;_div]:bg-surface-container-high [&amp;_span.material-symbols-outlined]:fill-1" data-path="profile" href="#"><div class="w-16 h-8 rounded-full flex items-center justify-center transition-colors group-active:scale-95"><span class="material-symbols-outlined text-[24px]">person</span></div><span class="font-label-sm text-label-sm tracking-tight">Profile</span></a></div></nav></body></html>

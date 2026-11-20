@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><title>TaskFlow</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary-container": "#675df9", "surface-bright": "#fcf8ff", "on-primary-container": "#fffbff", "surface-container-high": "#e9e5ff", "on-primary-fixed": "#100069", "on-secondary-container": "#fffbff", "tertiary-container": "#00855b", "outline": "#777587", "on-error-container": "#93000a", "on-tertiary-fixed": "#002113", "surface-container": "#efebff", "inverse-primary": "#c4c0ff", "surface-variant": "#e3dfff", "on-tertiary-fixed-variant": "#005236", "on-secondary-fixed": "#0f0069", "inverse-surface": "#2d2a5b", "secondary-fixed": "#e2dfff", "secondary-fixed-dim": "#c3c0ff", "outline-variant": "#c7c4d8", "primary-fixed-dim": "#c4c0ff", "on-secondary": "#ffffff", "surface": "#fcf8ff", "primary": "#4d41df", "surface-container-low": "#f6f2ff", "background": "#fcf8ff", "on-primary": "#ffffff", "surface-tint": "#4f44e2", "tertiary-fixed": "#6ffbbe", "on-surface-variant": "#464555", "surface-container-highest": "#e3dfff", "tertiary-fixed-dim": "#4edea3", "on-primary-fixed-variant": "#3622ca", "on-tertiary-container": "#f5fff6", "on-secondary-fixed-variant": "#3323cc", "on-tertiary": "#ffffff", "on-background": "#181445", "error": "#ba1a1a", "secondary-container": "#645efb", "error-container": "#ffdad6", "surface-container-lowest": "#ffffff", "tertiary": "#006947", "primary-fixed": "#e3dfff", "on-error": "#ffffff", "surface-dim": "#dad6ff", "on-surface": "#181445", "secondary": "#4b41e1", "inverse-on-surface": "#f3eeff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "space-xs": "0.25rem", "gutter": "1rem", "space-lg": "1.5rem", "margin": "1rem", "space-sm": "0.5rem", "space-xl": "2rem" }, fontFamily: { "headline-lg": ["Inter"], "body-md": ["Inter"], "headline-lg-mobile": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Inter"], "title-md": ["Inter"], "title-lg": ["Inter"] }, fontSize: { "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "display-lg": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "500" }], "title-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#fcf8ff;color:#181445;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="w-full flex items-center justify-between px-space-md pt-2 pb-1 text-on-surface"><span class="font-label-sm text-label-sm font-semibold tracking-wide">9:41</span><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">signal_cellular_4_bar</span><span class="material-symbols-outlined text-[15px]">wifi</span><span class="material-symbols-outlined text-[15px]">battery_full</span></div></div><div class="h-16 px-space-md flex items-center justify-between"><div class="flex items-center gap-2"><button aria-label="Back" class="w-11 h-11 -ml-2 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container active:scale-95 transition-all" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><img alt="TaskFlow Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrDBLTcJLwN-PFDBmT8SgyY-h_I_TaMaKU-0yEYWoNBxkxyZ2SYHlsgnqriDWU643_lOCBDe7jipEujZPuAp_O4QIbts8WrDRDPCK_nPq5uRoPDxiZOA2Q_nRH2Y0YsQvRDKOiVkuaKbKfSV3vI1m8SDai0tPIrr6FOi0z2yIKSLaYp5MZgOiEzYwbKaUO2IyZ2mxT9Nq-DTQra0_Zk2IrLHz3hgVW6ZBybSsBSOVCyG"/><h1 class="font-title-lg text-title-lg text-on-surface tracking-tight ml-1">Add Task</h1></div><div class="flex items-center gap-1"><button aria-label="More options" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all" type="button"><span class="material-symbols-outlined text-[22px]">more_vert</span></button><img alt="Profile" class="w-8 h-8 rounded-full object-cover ml-1 ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJogtU52hnElKTHxSE7G7EAjozCfdoKdHfg0Ez8mjChYePom5zXV4KCUHn8DJOp_6FdB0b_bHWPEnlOlHwfmIpIxQMbG0YS4rPIGD59qvbmjn7UEeorvGpFUeWccv9rNeqVfjcRPKykb9dbbVTiAWguIIXV-pvBc9X2aA6eehC0AlkhWs79LquuJ6r_WzaBymeN0n4JjH9RseLDCU1cP0v9tVpMCMRwtm6xsF3KtVB"/></div></div></header><main class="flex-1 flex flex-col relative w-full pt-[92px] pb-safe bg-surface"><div class="flex flex-col w-full pb-8">
+<!-- Subtle Modal Sheet Header Context -->
+<div class="px-space-md pt-2 pb-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">New Task</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+        Draft
+      </span>
+</div>
+<button aria-label="Discard Draft" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Main Card Surface Form Container -->
+<div class="px-space-md flex flex-col gap-4">
+<!-- Title & Description Section -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-3">
+<div class="flex items-start gap-3">
+<div class="mt-1 w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<input class="w-full bg-transparent font-title-lg text-title-lg text-on-surface placeholder:text-outline/70 focus:outline-none tracking-tight font-semibold" id="task-title-input" placeholder="What needs to be done?" type="text" value="Review design tokens for TaskFlow 2.0"/>
+</div>
+</div>
+<div class="pl-9 pr-1">
+<textarea class="w-full bg-transparent font-body-md text-body-md text-on-surface-variant placeholder:text-outline/60 focus:outline-none resize-none leading-relaxed" placeholder="Add notes, checklists, or project details..." rows="2">Align color variables with Material You Scandinavian specs and finalize responsive tokens.</textarea>
+</div>
+<!-- Quick Context Visual Card (Delight element) -->
+<div class="pl-9 pt-1 flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Clean Scandinavian desk setup with purple violet notebook, fine-tip pen, sleek laptop displaying structured purple UI widgets with soft morning light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQdq5eqQKYqep0lnqi-EdDm7s8rpn2gEzttJuomMBawuuoXBYJMdvDn8aXboC1CeeIpfe0M19Q0apLF-U9BAAjeVPlivzTFTQewH0a23eR-t1cD3ZYH184KL6bK3aTQ6MMOIEdKnOJKG5_WJXOi8wRRuKSGJdRS6QD0TE52Sai7FrFDkYFBp2OOxCTzxMQs7ZoNxgDatKYF7jDH_BRF7hl3J87EJeOAXoHaLVfUphR"/>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-label-md text-label-md text-on-surface font-medium truncate">TaskFlow 2.0 Sprint Workspace</p>
+<p class="font-label-sm text-label-sm text-outline">Connected to Design System Board</p>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">attachment</span>
+</div>
+</div>
+<!-- Category Chips Section -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase font-semibold">Category</span>
+<span class="font-label-sm text-label-sm text-primary font-semibold">1 selected</span>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar -mx-space-md px-space-md">
+<button class="category-chip px-3.5 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5 shrink-0 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" type="button">
+<span>💼</span> Work
+        </button>
+<button class="category-chip px-3.5 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5 shrink-0 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" type="button">
+<span>👤</span> Personal
+        </button>
+<button class="category-chip px-3.5 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5 shrink-0 bg-primary text-on-primary shadow-sm active:scale-95 transition-all" type="button">
+<span>🎨</span> Design
+        </button>
+<button class="category-chip px-3.5 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5 shrink-0 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" type="button">
+<span>🏃</span> Fitness
+        </button>
+<button class="category-chip px-3.5 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5 shrink-0 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" type="button">
+<span>📚</span> Study
+        </button>
+<button class="px-3 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1 shrink-0 bg-surface-container-high text-primary hover:bg-surface-container-highest transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span> Custom
+        </button>
+</div>
+</div>
+<!-- Priority Selector -->
+<div class="flex flex-col gap-2">
+<span class="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase font-semibold px-1">Priority</span>
+<div class="grid grid-cols-3 gap-2 p-1 bg-surface-container rounded-xl">
+<button class="priority-btn py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-label-md text-label-md font-medium text-on-surface-variant bg-transparent transition-all" onclick="setPriority(this, 'low')" type="button">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>Low</span>
+</button>
+<button class="priority-btn py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-label-md text-label-md font-medium text-on-surface-variant bg-transparent transition-all" onclick="setPriority(this, 'med')" type="button">
+<span class="w-2 h-2 rounded-full bg-amber-400"></span>
+<span>Medium</span>
+</button>
+<button class="priority-btn py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-label-md text-label-md font-semibold text-error bg-surface-container-lowest shadow-sm transition-all" onclick="setPriority(this, 'high')" type="button">
+<span class="w-2 h-2 rounded-full bg-error animate-ping"></span>
+<span>High</span>
+</button>
+</div>
+</div>
+<!-- Date & Time Row -->
+<div class="flex flex-col gap-2">
+<span class="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase font-semibold px-1">Schedule</span>
+<div class="grid grid-cols-2 gap-2">
+<button class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 text-left active:scale-[0.98] transition-transform" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-label-sm text-label-sm text-outline">Due Date</p>
+<p class="font-label-md text-label-md text-on-surface font-semibold truncate">Today, Oct 24</p>
+</div>
+</button>
+<button class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 text-left active:scale-[0.98] transition-transform" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-label-sm text-label-sm text-outline">Due Time</p>
+<p class="font-label-md text-label-md text-on-surface font-semibold truncate">03:30 PM</p>
+</div>
+</button>
+</div>
+</div>
+<!-- Reminders & Recurrence Card -->
+<div class="p-3.5 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-3">
+<!-- Reminder Toggle -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">notifications_active</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-semibold">Reminder</p>
+<p class="font-label-sm text-label-sm text-outline">15 minutes before</p>
+</div>
+</div>
+<button class="w-11 h-6 rounded-full bg-primary p-0.5 flex items-center transition-colors" id="reminder-toggle" onclick="toggleSwitch(this)" type="button">
+<span class="w-5 h-5 rounded-full bg-surface-container-lowest shadow-sm transform translate-x-5 transition-transform"></span>
+</button>
+</div>
+<div class="h-[1px] w-full bg-surface-container"></div>
+<!-- Repeat Dropdown -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">repeat</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-semibold">Repeat</p>
+<p class="font-label-sm text-label-sm text-outline">Does not repeat</p>
+</div>
+</div>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant font-label-md text-label-md font-medium flex items-center gap-1 hover:bg-surface-container-high transition-colors" type="button">
+<span>Options</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Subtasks / Checklist Section -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase font-semibold">Subtasks</span>
+<span class="font-label-sm text-label-sm text-outline">1 of 2 completed</span>
+</div>
+<div class="p-3.5 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-2.5">
+<!-- Subtask 1 (Completed) -->
+<div class="flex items-center gap-3 p-1.5 rounded-lg bg-surface-container-low/60">
+<button class="w-5 h-5 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shrink-0" type="button">
+<span class="material-symbols-outlined text-[14px]">done</span>
+</button>
+<span class="font-body-md text-body-md text-outline line-through flex-1 truncate">Audit current mobile app color palettes</span>
+<button class="text-outline hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Subtask 2 (Pending) -->
+<div class="flex items-center gap-3 p-1.5 rounded-lg">
+<button class="w-5 h-5 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 hover:bg-primary-container transition-colors" type="button">
+</button>
+<span class="font-body-md text-body-md text-on-surface flex-1 truncate">Sync with mobile engineering team on Tailwind tokens</span>
+<button class="text-outline hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Add Subtask Action Button -->
+<button class="mt-1 py-2 px-3 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 active:scale-[0.99] transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add subtask</span>
+</button>
+</div>
+</div>
+<!-- Visual Milestone Progress Preview -->
+<div class="p-3 rounded-xl bg-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+</div>
+<span class="font-label-md text-label-md text-on-primary-fixed-variant font-medium">Auto-estimate: 45 min focus block</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-primary">High Momentum</span>
+</div>
+<!-- Sticky / Bottom Floating CTA Action Container -->
+<div class="pt-2 flex flex-col gap-2">
+<button class="w-full h-14 rounded-full bg-primary-container hover:bg-primary text-on-primary font-title-md text-title-md font-semibold shadow-lg shadow-primary-container/25 flex items-center justify-center gap-2 active:scale-[0.98] transition-all" id="save-task-btn" onclick="triggerTaskSaved()" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+<span>Save Task</span>
+</button>
+<button class="w-full py-2 rounded-full font-label-md text-label-md text-outline hover:text-on-surface transition-colors" type="button">
+        Save as Template
+      </button>
+</div>
+</div>
+</div>
+<script>
+  function toggleSwitch(btn) {
+    const knob = btn.firstElementChild;
+    const isActive = btn.classList.contains('bg-primary');
+    if (isActive) {
+      btn.classList.remove('bg-primary');
+      btn.classList.add('bg-surface-variant');
+      knob.classList.remove('translate-x-5');
+      knob.classList.add('translate-x-0');
+    } else {
+      btn.classList.remove('bg-surface-variant');
+      btn.classList.add('bg-primary');
+      knob.classList.remove('translate-x-0');
+      knob.classList.add('translate-x-5');
+    }
+  }
+
+  function setPriority(button, level) {
+    const container = button.parentElement;
+    const buttons = container.querySelectorAll('.priority-btn');
+    buttons.forEach(b => {
+      b.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-error', 'text-tertiary', 'text-amber-500', 'font-semibold');
+      b.classList.add('bg-transparent', 'text-on-surface-variant', 'font-medium');
+    });
+
+    button.classList.remove('bg-transparent', 'text-on-surface-variant', 'font-medium');
+    button.classList.add('bg-surface-container-lowest', 'shadow-sm', 'font-semibold');
+
+    if (level === 'high') {
+      button.classList.add('text-error');
+    } else if (level === 'med') {
+      button.classList.add('text-amber-500');
+    } else {
+      button.classList.add('text-tertiary');
+    }
+  }
+
+  function triggerTaskSaved() {
+    const btn = document.getElementById('save-task-btn');
+    btn.innerHTML = `<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Saving to Tasks...</span>`;
+    setTimeout(() => {
+      btn.innerHTML = `<span class="material-symbols-outlined text-[20px]">task_alt</span><span>Task Created!</span>`;
+      btn.classList.remove('bg-primary-container');
+      btn.classList.add('bg-tertiary-container', 'text-on-tertiary-container');
+    }, 600);
+  }
+</script></main></body></html>

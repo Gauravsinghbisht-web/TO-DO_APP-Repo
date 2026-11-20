@@ -1,0 +1,100 @@
+{
+  "name": "projects/14424598070191423773",
+  "title": "TaskFlow Productivity App UI",
+  "projectType": "TEXT_TO_UI_PRO",
+  "origin": "WEB",
+  "deviceType": "MOBILE",
+  "visibility": "PRIVATE",
+  "createTime": "2026-11-19T06:49:07.133733Z",
+  "updateTime": "2026-11-19T06:54:22.609446Z",
+  "screenInstances": [
+    {
+      "height": 884,
+      "id": "40f9eef8873c45a09107b753824ea41b",
+      "label": "Splash Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/40f9eef8873c45a09107b753824ea41b",
+      "width": 390,
+      "x": 1024
+    },
+    {
+      "height": 976,
+      "id": "7129a696429d4aa3a83de10b00ee782f",
+      "label": "Signup Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/7129a696429d4aa3a83de10b00ee782f",
+      "width": 390,
+      "x": 2386
+    },
+    {
+      "height": 1372,
+      "id": "7a23dc3a02ee4e2a9d17b58ad791ecd3",
+      "label": "All Tasks Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/7a23dc3a02ee4e2a9d17b58ad791ecd3",
+      "width": 390,
+      "x": 3294
+    },
+    {
+      "height": 1246,
+      "id": "afb0d7449fef42eeb09325eae89b74ad",
+      "label": "Profile Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/afb0d7449fef42eeb09325eae89b74ad",
+      "width": 390,
+      "x": 4656
+    },
+    {
+      "height": 540,
+      "id": "assets_a4bdd5245146460895637b21ba0864e6",
+      "sourceAsset": "assets/a4bdd5245146460895637b21ba0864e6",
+      "type": "DESIGN_SYSTEM_INSTANCE",
+      "width": 960
+    },
+    {
+      "height": 1123,
+      "id": "bec7e0afc68143d1ad6f42c1644f2136",
+      "label": "Add Task Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/bec7e0afc68143d1ad6f42c1644f2136",
+      "width": 390,
+      "x": 3748
+    },
+    {
+      "height": 884,
+      "id": "cab558002b5d4c23a51a9fd8d4227ead",
+      "label": "Login Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/cab558002b5d4c23a51a9fd8d4227ead",
+      "width": 390,
+      "x": 1932
+    },
+    {
+      "height": 1130,
+      "id": "cfb2bbaab93e41ef81d85ce098125f28",
+      "label": "Calendar Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/cfb2bbaab93e41ef81d85ce098125f28",
+      "width": 390,
+      "x": 4202
+    },
+    {
+      "height": 884,
+      "id": "f43c8ce076924452bb9a301bab122282",
+      "label": "Onboarding Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/f43c8ce076924452bb9a301bab122282",
+      "width": 390,
+      "x": 1478
+    },
+    {
+      "height": 1504,
+      "id": "f44416bf43be471dbfc41c3da3b02b0b",
+      "label": "Statistics Screen",
+      "sourceScreen": "projects/14424598070191423773/screens/f44416bf43be471dbfc41c3da3b02b0b",
+      "width": 390,
+      "x": 5110
+    },
+    {
+      "height": 1102,
+      "id": "fdca650339684cc78b594d01c9d9694c",
+      "label": "Home Dashboard",
+      "sourceScreen": "projects/14424598070191423773/screens/fdca650339684cc78b594d01c9d9694c",
+      "width": 390,
+      "x": 2840,
+      "y": -8
+    }
+  ]
+}

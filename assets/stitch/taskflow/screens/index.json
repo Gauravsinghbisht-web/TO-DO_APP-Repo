@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Profile Screen",
+    "screenId": "afb0d7449fef42eeb09325eae89b74ad",
+    "resourceName": "projects/14424598070191423773/screens/afb0d7449fef42eeb09325eae89b74ad",
+    "htmlFile": "screens/profile-screen.html",
+    "screenshotFile": "screens/profile-screen.png"
+  },
+  {
+    "title": "Signup Screen",
+    "screenId": "7129a696429d4aa3a83de10b00ee782f",
+    "resourceName": "projects/14424598070191423773/screens/7129a696429d4aa3a83de10b00ee782f",
+    "htmlFile": "screens/signup-screen.html",
+    "screenshotFile": "screens/signup-screen.png"
+  },
+  {
+    "title": "Splash Screen",
+    "screenId": "40f9eef8873c45a09107b753824ea41b",
+    "resourceName": "projects/14424598070191423773/screens/40f9eef8873c45a09107b753824ea41b",
+    "htmlFile": "screens/splash-screen.html",
+    "screenshotFile": "screens/splash-screen.png"
+  },
+  {
+    "title": "Add Task Screen",
+    "screenId": "bec7e0afc68143d1ad6f42c1644f2136",
+    "resourceName": "projects/14424598070191423773/screens/bec7e0afc68143d1ad6f42c1644f2136",
+    "htmlFile": "screens/add-task-screen.html",
+    "screenshotFile": "screens/add-task-screen.png"
+  },
+  {
+    "title": "Calendar Screen",
+    "screenId": "cfb2bbaab93e41ef81d85ce098125f28",
+    "resourceName": "projects/14424598070191423773/screens/cfb2bbaab93e41ef81d85ce098125f28",
+    "htmlFile": "screens/calendar-screen.html",
+    "screenshotFile": "screens/calendar-screen.png"
+  },
+  {
+    "title": "All Tasks Screen",
+    "screenId": "7a23dc3a02ee4e2a9d17b58ad791ecd3",
+    "resourceName": "projects/14424598070191423773/screens/7a23dc3a02ee4e2a9d17b58ad791ecd3",
+    "htmlFile": "screens/all-tasks-screen.html",
+    "screenshotFile": "screens/all-tasks-screen.png"
+  },
+  {
+    "title": "Login Screen",
+    "screenId": "cab558002b5d4c23a51a9fd8d4227ead",
+    "resourceName": "projects/14424598070191423773/screens/cab558002b5d4c23a51a9fd8d4227ead",
+    "htmlFile": "screens/login-screen.html",
+    "screenshotFile": "screens/login-screen.png"
+  },
+  {
+    "title": "Home Dashboard",
+    "screenId": "fdca650339684cc78b594d01c9d9694c",
+    "resourceName": "projects/14424598070191423773/screens/fdca650339684cc78b594d01c9d9694c",
+    "htmlFile": "screens/home-dashboard.html",
+    "screenshotFile": "screens/home-dashboard.png"
+  },
+  {
+    "title": "Onboarding Screen",
+    "screenId": "f43c8ce076924452bb9a301bab122282",
+    "resourceName": "projects/14424598070191423773/screens/f43c8ce076924452bb9a301bab122282",
+    "htmlFile": "screens/onboarding-screen.html",
+    "screenshotFile": "screens/onboarding-screen.png"
+  },
+  {
+    "title": "Statistics Screen",
+    "screenId": "f44416bf43be471dbfc41c3da3b02b0b",
+    "resourceName": "projects/14424598070191423773/screens/f44416bf43be471dbfc41c3da3b02b0b",
+    "htmlFile": "screens/statistics-screen.html",
+    "screenshotFile": "screens/statistics-screen.png"
+  }
+]
