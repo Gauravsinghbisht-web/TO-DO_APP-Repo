@@ -95,8 +95,8 @@ void main() {
 
     await tester.pumpWidget(_testApp(provider, const StatisticsScreen()));
     await tester.pumpAndSettle();
-    expect(find.text('Pending Tasks'), findsOneWidget);
-    expect(find.text('0'), findsWidgets);
+    expect(find.text('No insights for this period yet'), findsOneWidget);
+    expect(find.text('Add Task'), findsOneWidget);
   });
 }
 

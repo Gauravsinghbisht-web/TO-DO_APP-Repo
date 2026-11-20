@@ -5,6 +5,8 @@ import '../core/theme/taskflow_theme.dart';
 import '../data/models/task.dart';
 import '../providers/task_provider.dart';
 import '../widgets/taskflow_bottom_navigation_bar.dart';
+import '../widgets/taskflow_empty_state.dart';
+import 'add_task_screen.dart';
 import 'profile_screen.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -161,23 +163,41 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   onSelected: (index) => setState(() => _selectedRange = index),
                 ),
                 const SizedBox(height: 22),
-                _MetricGrid(
-                  snapshot: snapshot,
-                  width: (constraints.maxWidth - 40).clamp(0.0, 760.0),
-                ),
-                const SizedBox(height: 22),
-                _ActivityCard(snapshot: snapshot, rangeIndex: _selectedRange),
-                const SizedBox(height: 22),
-                _CategoryDistributionCard(snapshot: snapshot),
-                const SizedBox(height: 22),
-                _PeakFocusCard(snapshot: snapshot),
-                const SizedBox(height: 16),
-                _AchievementCard(snapshot: snapshot),
+                if (snapshot.completedTasks + snapshot.pendingTasks == 0)
+                  TaskFlowEmptyState(
+                    icon: Icons.insights_rounded,
+                    title: 'No insights for this period yet',
+                    message:
+                        'Create a task to see your activity and progress here.',
+                    actionLabel: 'Add Task',
+                    actionIcon: Icons.add_rounded,
+                    onAction: _addTask,
+                  )
+                else ...[
+                  _MetricGrid(
+                    snapshot: snapshot,
+                    width: (constraints.maxWidth - 40).clamp(0.0, 760.0),
+                  ),
+                  const SizedBox(height: 22),
+                  _ActivityCard(snapshot: snapshot, rangeIndex: _selectedRange),
+                  const SizedBox(height: 22),
+                  _CategoryDistributionCard(snapshot: snapshot),
+                  const SizedBox(height: 22),
+                  _PeakFocusCard(snapshot: snapshot),
+                  const SizedBox(height: 16),
+                  _AchievementCard(snapshot: snapshot),
+                ],
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _addTask() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(builder: (_) => const AddTaskScreen()),
     );
   }
 

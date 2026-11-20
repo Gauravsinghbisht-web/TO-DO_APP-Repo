@@ -10,6 +10,7 @@ import 'calendar_screen.dart';
 import 'profile_screen.dart';
 import 'statistics_screen.dart';
 import 'tasks_screen.dart';
+import '../widgets/taskflow_empty_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -181,7 +182,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 if (filteredTasks.isEmpty)
-                  const _EmptyTasksMessage()
+                  TaskFlowEmptyState(
+                    icon: _tasks.isEmpty
+                        ? Icons.add_task_rounded
+                        : _searchController.text.trim().isNotEmpty
+                        ? Icons.search_off_rounded
+                        : Icons.filter_alt_off_rounded,
+                    title: _tasks.isEmpty
+                        ? 'No tasks yet'
+                        : _searchController.text.trim().isNotEmpty
+                        ? 'No matching tasks'
+                        : 'No tasks in this view',
+                    message: _tasks.isEmpty
+                        ? 'Add a task to start shaping your day.'
+                        : _searchController.text.trim().isNotEmpty
+                        ? 'Try another search, or clear it to see all tasks.'
+                        : 'There are no tasks for the selected filter.',
+                    actionLabel: _tasks.isEmpty
+                        ? 'Add Task'
+                        : _searchController.text.trim().isNotEmpty
+                        ? 'Clear Search & Filters'
+                        : 'Clear Filter',
+                    actionIcon: _tasks.isEmpty
+                        ? Icons.add_rounded
+                        : Icons.filter_alt_off_rounded,
+                    onAction: _tasks.isEmpty
+                        ? _addTask
+                        : () => setState(() {
+                            _searchController.clear();
+                            _selectedFilter = 0;
+                          }),
+                  )
                 else
                   ...filteredTasks.map(
                     (task) => Padding(
@@ -204,9 +235,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showInfo(String message) {
+  void _showInfo(String message, {VoidCallback? onRetry}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        action: onRetry == null
+            ? null
+            : SnackBarAction(label: 'Retry', onPressed: onRetry),
+      ),
     );
   }
 
@@ -220,7 +257,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final provider = context.read<TaskProvider>();
     final changed = await provider.toggleTaskCompletion(task.id);
     if (!changed && mounted) {
-      _showInfo(provider.errorMessage ?? 'Could not update task.');
+      _showInfo(
+        provider.errorMessage ?? 'Could not update task. Please try again.',
+        onRetry: () => _toggleTask(task),
+      );
     }
   }
 
@@ -246,7 +286,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final deleted = await context.read<TaskProvider>().deleteTask(task.id);
       if (!deleted && mounted) {
         _showInfo(
-          context.read<TaskProvider>().errorMessage ?? 'Could not delete task.',
+          context.read<TaskProvider>().errorMessage ??
+              'Could not delete task. Please try again.',
+          onRetry: () => _deleteTask(task),
         );
       }
     }
@@ -1006,29 +1048,6 @@ class _StreakReminderCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _EmptyTasksMessage extends StatelessWidget {
-  const _EmptyTasksMessage();
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 32),
-    child: Column(
-      children: [
-        const Icon(
-          Icons.task_alt_rounded,
-          color: TaskFlowColors.primary,
-          size: 38,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'No matching tasks',
-          style: Theme.of(context).textTheme.titleMedium,
         ),
       ],
     ),

@@ -9,6 +9,7 @@ import 'add_task_screen.dart';
 import 'calendar_screen.dart';
 import 'profile_screen.dart';
 import 'statistics_screen.dart';
+import '../widgets/taskflow_empty_state.dart';
 
 enum _TaskStatus { pending, done }
 
@@ -181,6 +182,8 @@ class _TasksScreenState extends State<TasksScreen> {
     List<_TaskItem> completed,
   ) {
     final textTheme = Theme.of(context).textTheme;
+    final hasNoTasks = context.watch<TaskProvider>().totalTasks == 0;
+    final hasSearch = _searchController.text.trim().isNotEmpty;
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 110),
@@ -268,63 +271,71 @@ class _TasksScreenState extends State<TasksScreen> {
                 const SizedBox(height: 20),
                 const _FocusPeakBanner(),
                 const SizedBox(height: 22),
-                _TaskSection(
-                  title: 'High Priority',
-                  count: highPriority.length,
-                  color: const Color(0xFFBA1A1A),
-                  tasks: highPriority,
-                  onTaskChanged: _setTaskStatus,
-                  onEditTask: _editTask,
-                  onDeleteTask: _deleteTask,
-                ),
-                const SizedBox(height: 22),
-                _TaskSection(
-                  title: 'In Progress',
-                  count: inProgress.length,
-                  color: const Color(0xFF675DF9),
-                  tasks: inProgress,
-                  onTaskChanged: _setTaskStatus,
-                  onEditTask: _editTask,
-                  onDeleteTask: _deleteTask,
-                ),
-                const SizedBox(height: 22),
-                _TaskSection(
-                  title: 'Completed',
-                  count: completed.length,
-                  color: TaskFlowColors.tertiary,
-                  tasks: completed,
-                  onTaskChanged: _setTaskStatus,
-                  onEditTask: _editTask,
-                  onDeleteTask: _deleteTask,
-                  onClear: completed.isEmpty
-                      ? null
-                      : () async {
-                          final provider = context.read<TaskProvider>();
-                          for (final task in completed) {
-                            final deleted = await provider.deleteTask(
-                              task.task.id,
-                            );
-                            if (!deleted && mounted) {
-                              _showMessage(
-                                provider.errorMessage ??
-                                    'Could not delete task.',
-                              );
-                              break;
-                            }
-                          }
-                        },
-                ),
-                if (highPriority.isEmpty &&
+                if (hasNoTasks &&
+                    _selectedStatus == 0 &&
+                    _selectedCategory == 'All Categories')
+                  TaskFlowEmptyState(
+                    icon: Icons.add_task_rounded,
+                    title: 'No tasks yet',
+                    message: 'Add a task to start organizing your day.',
+                    actionLabel: 'Add Task',
+                    actionIcon: Icons.add_rounded,
+                    onAction: _addTask,
+                  )
+                else if (highPriority.isEmpty &&
                     inProgress.isEmpty &&
                     completed.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Text(
-                      'No tasks match these filters.',
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodyMedium,
-                    ),
+                  _filteredEmptyState(hasSearch: hasSearch)
+                else ...[
+                  _TaskSection(
+                    title: 'High Priority',
+                    count: highPriority.length,
+                    color: const Color(0xFFBA1A1A),
+                    tasks: highPriority,
+                    onTaskChanged: _setTaskStatus,
+                    onEditTask: _editTask,
+                    onDeleteTask: _deleteTask,
                   ),
+                  const SizedBox(height: 22),
+                  _TaskSection(
+                    title: 'In Progress',
+                    count: inProgress.length,
+                    color: const Color(0xFF675DF9),
+                    tasks: inProgress,
+                    onTaskChanged: _setTaskStatus,
+                    onEditTask: _editTask,
+                    onDeleteTask: _deleteTask,
+                  ),
+                  const SizedBox(height: 22),
+                  _TaskSection(
+                    title: 'Completed',
+                    count: completed.length,
+                    color: TaskFlowColors.tertiary,
+                    tasks: completed,
+                    onTaskChanged: _setTaskStatus,
+                    onEditTask: _editTask,
+                    onDeleteTask: _deleteTask,
+                    onClear: completed.isEmpty
+                        ? null
+                        : () async {
+                            final provider = context.read<TaskProvider>();
+                            for (final task in completed) {
+                              final deleted = await provider.deleteTask(
+                                task.task.id,
+                              );
+                              if (!deleted && mounted) {
+                                _showMessage(
+                                  provider.errorMessage ??
+                                      'Could not delete task. Please try again.',
+                                  onRetry: () =>
+                                      provider.deleteTask(task.task.id),
+                                );
+                                break;
+                              }
+                            }
+                          },
+                  ),
+                ],
               ],
             ),
           ),
@@ -333,11 +344,62 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
+  Widget _filteredEmptyState({required bool hasSearch}) {
+    if (hasSearch) {
+      return TaskFlowEmptyState(
+        icon: Icons.search_off_rounded,
+        title: 'No matching tasks',
+        message: 'Try another search or clear it to see your tasks.',
+        actionLabel: 'Clear Search & Filters',
+        actionIcon: Icons.close_rounded,
+        onAction: () => setState(_clearFilters),
+      );
+    }
+    if (_selectedStatus == 2) {
+      return TaskFlowEmptyState(
+        icon: Icons.task_alt_rounded,
+        title: 'No completed tasks yet',
+        message: 'Finish a task and it will appear here.',
+        actionLabel: 'View Pending Tasks',
+        actionIcon: Icons.pending_actions_rounded,
+        onAction: () => setState(() => _selectedStatus = 1),
+      );
+    }
+    if (_selectedStatus == 1) {
+      return TaskFlowEmptyState(
+        icon: Icons.check_circle_outline_rounded,
+        title: 'No pending tasks',
+        message:
+            'You are all caught up. Add another task whenever you are ready.',
+        actionLabel: 'Add Task',
+        actionIcon: Icons.add_rounded,
+        onAction: _addTask,
+      );
+    }
+    return TaskFlowEmptyState(
+      icon: Icons.filter_alt_off_rounded,
+      title: 'No tasks match these filters',
+      message: 'Clear the filters to see your full task list.',
+      actionLabel: 'Clear Filters',
+      actionIcon: Icons.filter_alt_off_rounded,
+      onAction: () => setState(_clearFilters),
+    );
+  }
+
+  void _clearFilters() {
+    _searchController.clear();
+    _selectedStatus = 0;
+    _selectedCategory = 'All Categories';
+  }
+
   Future<void> _setTaskStatus(_TaskItem task, bool isDone) async {
     final provider = context.read<TaskProvider>();
     final changed = await provider.toggleTaskCompletion(task.task.id);
     if (!changed && mounted) {
-      _showMessage(provider.errorMessage ?? 'Could not update task.');
+      _showMessage(
+        provider.errorMessage ?? 'Could not update task. Please try again.',
+        onRetry: () => _setTaskStatus(task, isDone),
+      );
     }
   }
 
@@ -371,7 +433,10 @@ class _TasksScreenState extends State<TasksScreen> {
       final provider = context.read<TaskProvider>();
       final deleted = await provider.deleteTask(item.task.id);
       if (!deleted && mounted) {
-        _showMessage(provider.errorMessage ?? 'Could not delete task.');
+        _showMessage(
+          provider.errorMessage ?? 'Could not delete task. Please try again.',
+          onRetry: () => _deleteTask(item),
+        );
       }
     }
   }
@@ -491,9 +556,15 @@ class _TasksScreenState extends State<TasksScreen> {
     _ => 'Tasks',
   };
 
-  void _showMessage(String message) {
+  void _showMessage(String message, {VoidCallback? onRetry}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        action: onRetry == null
+            ? null
+            : SnackBarAction(label: 'Retry', onPressed: onRetry),
+      ),
     );
   }
 }

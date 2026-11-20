@@ -104,17 +104,14 @@ class SplashScreen extends StatelessWidget {
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 36),
-                            const SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                color: TaskFlowColors.primary,
-                              ),
+                            const Icon(
+                              Icons.check_circle_outline_rounded,
+                              size: 40,
+                              color: TaskFlowColors.primary,
                             ),
                             const SizedBox(height: 14),
                             Text(
-                              'Syncing offline routines...',
+                              'Your tasks are ready',
                               style: textTheme.bodyLarge?.copyWith(
                                 color: TaskFlowColors.secondaryText,
                               ),

@@ -129,7 +129,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 const SizedBox(height: 14),
                 if (tasksForDate.isEmpty)
-                  const _NoScheduledTasks()
+                  _NoScheduledTasks(onAddTask: _addTask)
                 else
                   for (final task in tasksForDate) ...[
                     _ScheduledTaskCard(task: task),
@@ -860,7 +860,9 @@ class _ScheduledTaskCard extends StatelessWidget {
 }
 
 class _NoScheduledTasks extends StatelessWidget {
-  const _NoScheduledTasks();
+  const _NoScheduledTasks({required this.onAddTask});
+
+  final VoidCallback onAddTask;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -886,6 +888,12 @@ class _NoScheduledTasks extends StatelessWidget {
           'Enjoy the open space or add a task for this day.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 16),
+        FilledButton.tonalIcon(
+          onPressed: onAddTask,
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Add Task'),
         ),
       ],
     ),

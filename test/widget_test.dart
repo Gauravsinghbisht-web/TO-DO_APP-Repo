@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:flutter_application_1/app.dart';
 import 'package:flutter_application_1/main.dart';
 
 void main() {
@@ -16,5 +17,23 @@ void main() {
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.debugShowCheckedModeBanner, isFalse);
     expect(app.theme?.textTheme.bodyMedium?.fontFamily, 'Inter');
+  });
+
+  testWidgets('storage error screen is friendly and can retry', (tester) async {
+    var retryCalled = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: TaskFlowApp(
+          startupError: StateError('private database path'),
+          onRetryStartup: () async => retryCalled = true,
+        ),
+      ),
+    );
+
+    expect(find.text('We couldn’t load your tasks'), findsOneWidget);
+    expect(find.text('private database path'), findsNothing);
+    await tester.tap(find.text('Try Again'));
+    await tester.pump();
+    expect(retryCalled, isTrue);
   });
 }

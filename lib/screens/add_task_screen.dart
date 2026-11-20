@@ -391,7 +391,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         : await provider.updateTask(task);
     if (!mounted) return;
     if (!saved) {
-      _showMessage(provider.errorMessage ?? 'Could not save this task.');
+      _showMessage(
+        provider.errorMessage ??
+            'We could not save this task. Please try again.',
+        onRetry: () => _saveTask(),
+      );
       return;
     }
     if (_reminderEnabled && !hasNotificationPermission) {
@@ -430,9 +434,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return '${months[date.month - 1]} ${date.day}';
   }
 
-  void _showMessage(String message) {
+  void _showMessage(String message, {VoidCallback? onRetry}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        action: onRetry == null
+            ? null
+            : SnackBarAction(label: 'Retry', onPressed: onRetry),
+      ),
     );
   }
 }

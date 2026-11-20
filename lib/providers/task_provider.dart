@@ -40,7 +40,8 @@ class TaskProvider extends ChangeNotifier {
       await _syncReminder(task);
       return true;
     } catch (error) {
-      _errorMessage = 'Could not save task: $error';
+      debugPrint('TaskFlow failed to save a task: $error');
+      _errorMessage = 'We could not save your task. Please try again.';
       notifyListeners();
       return false;
     }
@@ -49,14 +50,17 @@ class TaskProvider extends ChangeNotifier {
   Future<bool> updateTask(Task task) async {
     try {
       final updated = await _repository.updateTask(task);
-      _errorMessage = updated ? null : 'Task no longer exists.';
+      _errorMessage = updated
+          ? null
+          : 'That task could not be found. Refresh and try again.';
       if (updated) {
         notifyListeners();
         await _syncReminder(task);
       }
       return updated;
     } catch (error) {
-      _errorMessage = 'Could not update task: $error';
+      debugPrint('TaskFlow failed to update a task: $error');
+      _errorMessage = 'We could not update your task. Please try again.';
       notifyListeners();
       return false;
     }
@@ -65,14 +69,17 @@ class TaskProvider extends ChangeNotifier {
   Future<bool> deleteTask(String taskId) async {
     try {
       final deleted = await _repository.deleteTask(taskId);
-      _errorMessage = deleted ? null : 'Task no longer exists.';
+      _errorMessage = deleted
+          ? null
+          : 'That task could not be found. Refresh and try again.';
       if (deleted) {
         notifyListeners();
         await _cancelReminder(taskId);
       }
       return deleted;
     } catch (error) {
-      _errorMessage = 'Could not delete task: $error';
+      debugPrint('TaskFlow failed to delete a task: $error');
+      _errorMessage = 'We could not delete your task. Please try again.';
       notifyListeners();
       return false;
     }
@@ -82,7 +89,9 @@ class TaskProvider extends ChangeNotifier {
     if (!_completionOperations.add(taskId)) return false;
     try {
       final changed = await _repository.toggleTaskCompletion(taskId);
-      _errorMessage = changed ? null : 'Task no longer exists.';
+      _errorMessage = changed
+          ? null
+          : 'That task could not be found. Refresh and try again.';
       if (changed) {
         notifyListeners();
         for (final task in tasks) {
@@ -98,7 +107,8 @@ class TaskProvider extends ChangeNotifier {
       }
       return changed;
     } catch (error) {
-      _errorMessage = 'Could not update task completion: $error';
+      debugPrint('TaskFlow failed to update task status: $error');
+      _errorMessage = 'We could not update the task status. Please try again.';
       notifyListeners();
       return false;
     } finally {
@@ -174,7 +184,9 @@ class TaskProvider extends ChangeNotifier {
     try {
       return await reminderService.requestPermission();
     } catch (error) {
-      _notificationError = 'Could not request notification permission: $error';
+      debugPrint('TaskFlow failed to check reminder permission: $error');
+      _notificationError =
+          'Reminder permission could not be checked. Review device settings.';
       notifyListeners();
       return false;
     }
@@ -191,9 +203,10 @@ class TaskProvider extends ChangeNotifier {
       }
       _notificationError = null;
     } catch (error) {
+      debugPrint('TaskFlow failed to update a task reminder: $error');
       // A notification failure must not undo a successful task write.
       _notificationError =
-          'Task saved, but its reminder could not be updated: $error';
+          'Task saved, but its reminder could not be updated. Check notification settings.';
       notifyListeners();
     }
   }
@@ -205,8 +218,9 @@ class TaskProvider extends ChangeNotifier {
       await reminderService.cancelReminder(taskId);
       _notificationError = null;
     } catch (error) {
+      debugPrint('TaskFlow failed to cancel a task reminder: $error');
       _notificationError =
-          'Task deleted, but its reminder could not be cancelled: $error';
+          'Task deleted, but its reminder could not be cancelled.';
       notifyListeners();
     }
   }

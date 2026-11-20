@@ -14,11 +14,13 @@ class TaskFlowApp extends StatelessWidget {
     this.taskRepository,
     this.reminderService,
     this.startupError,
+    this.onRetryStartup,
   });
 
   final TaskRepository? taskRepository;
   final TaskReminderService? reminderService;
   final Object? startupError;
+  final Future<void> Function()? onRetryStartup;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class TaskFlowApp extends StatelessWidget {
         title: 'TaskFlow',
         debugShowCheckedModeBanner: false,
         theme: TaskFlowTheme.light,
-        home: _StorageErrorScreen(error: startupError.toString()),
+        home: _StorageErrorScreen(onRetry: onRetryStartup),
       );
     }
 
@@ -47,10 +49,25 @@ class TaskFlowApp extends StatelessWidget {
   }
 }
 
-class _StorageErrorScreen extends StatelessWidget {
-  const _StorageErrorScreen({required this.error});
+class _StorageErrorScreen extends StatefulWidget {
+  const _StorageErrorScreen({required this.onRetry});
 
-  final String error;
+  final Future<void> Function()? onRetry;
+
+  @override
+  State<_StorageErrorScreen> createState() => _StorageErrorScreenState();
+}
+
+class _StorageErrorScreenState extends State<_StorageErrorScreen> {
+  bool _retrying = false;
+
+  Future<void> _retry() async {
+    final retry = widget.onRetry;
+    if (retry == null || _retrying) return;
+    setState(() => _retrying = true);
+    await retry();
+    if (mounted) setState(() => _retrying = false);
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -63,12 +80,27 @@ class _StorageErrorScreen extends StatelessWidget {
             const Icon(Icons.storage_rounded, size: 48),
             const SizedBox(height: 16),
             Text(
-              'TaskFlow could not open local task storage.',
+              'We couldn’t load your tasks',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            Text(error, textAlign: TextAlign.center),
+            Text(
+              'Please try again. Your saved tasks have not been removed.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: _retrying || widget.onRetry == null ? null : _retry,
+              icon: _retrying
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh_rounded),
+              label: Text(_retrying ? 'Trying again…' : 'Try Again'),
+            ),
           ],
         ),
       ),
