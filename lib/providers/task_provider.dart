@@ -13,6 +13,7 @@ class TaskProvider extends ChangeNotifier {
   final TaskReminderService? reminderService;
   String? _errorMessage;
   String? _notificationError;
+  final Set<String> _completionOperations = {};
 
   String? get errorMessage => _errorMessage;
   String? get notificationError => _notificationError;
@@ -78,6 +79,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<bool> toggleTaskCompletion(String taskId) async {
+    if (!_completionOperations.add(taskId)) return false;
     try {
       final changed = await _repository.toggleTaskCompletion(taskId);
       _errorMessage = changed ? null : 'Task no longer exists.';
@@ -86,6 +88,10 @@ class TaskProvider extends ChangeNotifier {
         for (final task in tasks) {
           if (task.id == taskId) {
             await _syncReminder(task);
+            if (task.isCompleted &&
+                task.recurrenceType != TaskRecurrence.none) {
+              await _createNextOccurrence(task);
+            }
             break;
           }
         }
@@ -95,7 +101,71 @@ class TaskProvider extends ChangeNotifier {
       _errorMessage = 'Could not update task completion: $error';
       notifyListeners();
       return false;
+    } finally {
+      _completionOperations.remove(taskId);
     }
+  }
+
+  Future<void> _createNextOccurrence(Task completedTask) async {
+    if (tasks.any((task) => task.parentTaskId == completedTask.id)) return;
+    final nextDueDate = _nextDueDate(completedTask);
+    if (nextDueDate == null) return;
+
+    final nextTask = Task(
+      id: '${completedTask.id}_${nextDueDate.millisecondsSinceEpoch}',
+      title: completedTask.title,
+      description: completedTask.description,
+      category: completedTask.category,
+      priority: completedTask.priority,
+      dueDate: nextDueDate,
+      dueTime: completedTask.dueTime,
+      reminderEnabled: completedTask.reminderEnabled,
+      reminderMinutesBefore: completedTask.reminderMinutesBefore,
+      recurrenceType: completedTask.recurrenceType,
+      recurrenceDayOfMonth: completedTask.recurrenceDayOfMonth,
+      parentTaskId: completedTask.id,
+      isCompleted: false,
+      subtasks: completedTask.subtasks,
+    );
+    // addTask persists and publishes the new occurrence, then schedules its
+    // reminder through the same service as any manually created task.
+    await addTask(nextTask);
+  }
+
+  static DateTime? _nextDueDate(Task task) {
+    final dueDate = task.dueDate;
+    if (dueDate == null) return null;
+    return switch (task.recurrenceType) {
+      TaskRecurrence.none => null,
+      TaskRecurrence.daily => DateTime(
+        dueDate.year,
+        dueDate.month,
+        dueDate.day + 1,
+      ),
+      TaskRecurrence.weekly => DateTime(
+        dueDate.year,
+        dueDate.month,
+        dueDate.day + 7,
+      ),
+      TaskRecurrence.monthly => _sameDayNextMonth(
+        dueDate,
+        task.recurrenceDayOfMonth ?? dueDate.day,
+      ),
+    };
+  }
+
+  static DateTime _sameDayNextMonth(DateTime date, int dayOfMonth) {
+    final firstOfNextMonth = DateTime(date.year, date.month + 1, 1);
+    final lastDayOfNextMonth = DateTime(
+      firstOfNextMonth.year,
+      firstOfNextMonth.month + 1,
+      0,
+    ).day;
+    return DateTime(
+      firstOfNextMonth.year,
+      firstOfNextMonth.month,
+      dayOfMonth > lastDayOfNextMonth ? lastDayOfNextMonth : dayOfMonth,
+    );
   }
 
   Future<bool> requestReminderPermission() async {

@@ -98,6 +98,9 @@ class TaskRepository {
         : {'hour': task.dueTime!.hour, 'minute': task.dueTime!.minute},
     'reminderEnabled': task.reminderEnabled,
     'reminderMinutesBefore': task.reminderMinutesBefore,
+    'recurrenceType': task.recurrenceType.name,
+    'recurrenceDayOfMonth': task.recurrenceDayOfMonth,
+    'parentTaskId': task.parentTaskId,
     'isCompleted': task.isCompleted,
     'subtasks': task.subtasks,
     'createdAt': task.createdAt.toIso8601String(),
@@ -111,15 +114,16 @@ class TaskRepository {
     );
     final dueTimeMap = map['dueTime'] as Map?;
 
+    final dueDate = map['dueDate'] == null
+        ? null
+        : DateTime.tryParse(map['dueDate'] as String);
     return Task(
       id: map['id'] as String,
       title: map['title'] as String? ?? '',
       description: map['description'] as String? ?? '',
       category: map['category'] as String? ?? 'Personal',
       priority: priority,
-      dueDate: map['dueDate'] == null
-          ? null
-          : DateTime.tryParse(map['dueDate'] as String),
+      dueDate: dueDate,
       dueTime: dueTimeMap == null
           ? null
           : TimeOfDay(
@@ -129,6 +133,10 @@ class TaskRepository {
       reminderEnabled: map['reminderEnabled'] as bool? ?? false,
       reminderMinutesBefore:
           (map['reminderMinutesBefore'] as num?)?.toInt() ?? 15,
+      recurrenceType: TaskRecurrence.fromName(map['recurrenceType'] as String?),
+      recurrenceDayOfMonth:
+          (map['recurrenceDayOfMonth'] as num?)?.toInt() ?? dueDate?.day,
+      parentTaskId: map['parentTaskId'] as String?,
       isCompleted: map['isCompleted'] as bool? ?? false,
       subtasks: (map['subtasks'] as List? ?? const []).cast<String>(),
       createdAt:

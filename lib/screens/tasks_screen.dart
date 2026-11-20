@@ -28,7 +28,7 @@ class _TaskItem {
   };
   List<String> get subtasks => task.subtasks;
   bool get reminderEnabled => false;
-  String get repeat => 'Does not repeat';
+  String get repeat => task.recurrenceType.label;
   int get estimatedMinutes => 30;
   _TaskStatus get status =>
       task.isCompleted ? _TaskStatus.done : _TaskStatus.pending;
@@ -998,6 +998,13 @@ class _TaskCard extends StatelessWidget {
                           color: TaskFlowColors.secondaryText,
                           background: const Color(0xFFE9E5FF),
                         ),
+                        if (task.task.recurrenceType != TaskRecurrence.none)
+                          _TaskBadge(
+                            icon: Icons.repeat_rounded,
+                            label: task.repeat,
+                            color: TaskFlowColors.primary,
+                            background: TaskFlowColors.lavenderContainer,
+                          ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

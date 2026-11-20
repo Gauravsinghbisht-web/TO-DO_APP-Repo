@@ -26,6 +26,8 @@ void main() {
       dueTime: const TimeOfDay(hour: 14, minute: 35),
       reminderEnabled: true,
       reminderMinutesBefore: 20,
+      recurrenceType: TaskRecurrence.monthly,
+      parentTaskId: 'original-occurrence',
       subtasks: const ['Draft', 'Review'],
       createdAt: DateTime(2026, 11, 20, 9),
     );
@@ -40,6 +42,9 @@ void main() {
     expect(savedTask.dueTime, const TimeOfDay(hour: 14, minute: 35));
     expect(savedTask.reminderEnabled, isTrue);
     expect(savedTask.reminderMinutesBefore, 20);
+    expect(savedTask.recurrenceType, TaskRecurrence.monthly);
+    expect(savedTask.recurrenceDayOfMonth, 24);
+    expect(savedTask.parentTaskId, 'original-occurrence');
     expect(savedTask.subtasks, ['Draft', 'Review']);
 
     final editedTask = savedTask.copyWith(
@@ -59,6 +64,8 @@ void main() {
     expect(savedTask.title, 'Edited persistent task');
     expect(savedTask.isCompleted, isTrue);
     expect(savedTask.dueDate, DateTime(2026, 11, 24));
+    expect(savedTask.recurrenceType, TaskRecurrence.monthly);
+    expect(savedTask.recurrenceDayOfMonth, 24);
 
     expect(await repository.deleteTask(task.id), isTrue);
     await Hive.close();
@@ -68,4 +75,44 @@ void main() {
       isFalse,
     );
   });
+
+  test(
+    'Hive records without recurrence fields load as non-recurring',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'taskflow_legacy_hive_',
+      );
+      addTearDown(() async {
+        await Hive.close();
+        await directory.delete(recursive: true);
+      });
+
+      Hive.init(directory.path);
+      final tasks = await Hive.openBox<dynamic>('taskflow_tasks');
+      final settings = await Hive.openBox<dynamic>('taskflow_settings');
+      await settings.put('sample_tasks_seeded', true);
+      await tasks.put('legacy-task', {
+        'id': 'legacy-task',
+        'title': 'Saved before recurrence support',
+        'description': '',
+        'category': 'Personal',
+        'priority': 'medium',
+        'dueDate': null,
+        'dueTime': null,
+        'reminderEnabled': false,
+        'reminderMinutesBefore': 15,
+        'isCompleted': false,
+        'subtasks': <String>[],
+        'createdAt': DateTime(2026, 1, 1).toIso8601String(),
+      });
+      await Hive.close();
+
+      final repository = await TaskRepository.open(directory: directory.path);
+      expect(
+        repository.getAllTasks().single.recurrenceType,
+        TaskRecurrence.none,
+      );
+      expect(repository.getAllTasks().single.parentTaskId, isNull);
+    },
+  );
 }

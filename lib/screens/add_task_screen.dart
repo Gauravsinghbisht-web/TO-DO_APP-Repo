@@ -15,7 +15,7 @@ class TaskDraft {
     required this.dueDate,
     required this.dueTime,
     required this.reminderEnabled,
-    required this.repeat,
+    required this.recurrenceType,
     required List<String> subtasks,
     required this.estimatedMinutes,
   }) : subtasks = List.unmodifiable(subtasks);
@@ -27,7 +27,7 @@ class TaskDraft {
   final DateTime dueDate;
   final TimeOfDay dueTime;
   final bool reminderEnabled;
-  final String repeat;
+  final TaskRecurrence recurrenceType;
   final List<String> subtasks;
   final int estimatedMinutes;
 }
@@ -54,7 +54,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   DateTime _dueDate = DateUtils.dateOnly(DateTime.now());
   TimeOfDay _dueTime = const TimeOfDay(hour: 15, minute: 30);
   bool _reminderEnabled = true;
-  String _repeat = 'Does not repeat';
+  TaskRecurrence _recurrenceType = TaskRecurrence.none;
   int _estimatedMinutes = 45;
 
   @override
@@ -70,6 +70,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       _dueDate = task.dueDate ?? _dueDate;
       _dueTime = task.dueTime ?? _dueTime;
       _reminderEnabled = task.reminderEnabled;
+      _recurrenceType = task.recurrenceType;
       _subtasks.addAll(task.subtasks.map(_Subtask.new));
     } else if (widget.initialDate != null) {
       _dueDate = DateUtils.dateOnly(widget.initialDate!);
@@ -193,9 +194,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             onReminderChanged: (value) => setState(() {
                               _reminderEnabled = value;
                             }),
-                            repeat: _repeat,
-                            onRepeatChanged: (value) => setState(() {
-                              _repeat = value;
+                            recurrenceType: _recurrenceType,
+                            onRecurrenceChanged: (value) => setState(() {
+                              _recurrenceType = value;
                             }),
                           ),
                           const SizedBox(height: 20),
@@ -354,7 +355,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       dueDate: _dueDate,
       dueTime: _dueTime,
       reminderEnabled: _reminderEnabled,
-      repeat: _repeat,
+      recurrenceType: _recurrenceType,
       subtasks: _subtasks.map((item) => item.title).toList(),
       estimatedMinutes: _estimatedMinutes,
     );
@@ -369,6 +370,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             dueTime: draft.dueTime,
             reminderEnabled: draft.reminderEnabled,
             reminderMinutesBefore: existingTask?.reminderMinutesBefore ?? 15,
+            recurrenceType: draft.recurrenceType,
+            recurrenceDayOfMonth: draft.dueDate.day,
             subtasks: draft.subtasks,
           )
         : existingTask.copyWith(
@@ -379,6 +382,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             dueDate: draft.dueDate,
             dueTime: draft.dueTime,
             reminderEnabled: draft.reminderEnabled,
+            recurrenceType: draft.recurrenceType,
+            recurrenceDayOfMonth: draft.dueDate.day,
             subtasks: draft.subtasks,
           );
     final saved = existingTask == null
@@ -898,14 +903,14 @@ class _ReminderRepeatCard extends StatelessWidget {
   const _ReminderRepeatCard({
     required this.reminderEnabled,
     required this.onReminderChanged,
-    required this.repeat,
-    required this.onRepeatChanged,
+    required this.recurrenceType,
+    required this.onRecurrenceChanged,
   });
 
   final bool reminderEnabled;
   final ValueChanged<bool> onReminderChanged;
-  final String repeat;
-  final ValueChanged<String> onRepeatChanged;
+  final TaskRecurrence recurrenceType;
+  final ValueChanged<TaskRecurrence> onRecurrenceChanged;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -938,16 +943,22 @@ class _ReminderRepeatCard extends StatelessWidget {
           contentPadding: EdgeInsets.zero,
           leading: const _SettingsIcon(icon: Icons.repeat_rounded),
           title: Text('Repeat', style: Theme.of(context).textTheme.titleMedium),
-          subtitle: Text(repeat, style: Theme.of(context).textTheme.bodySmall),
-          trailing: DropdownButton<String>(
-            value: repeat,
+          subtitle: Text(
+            recurrenceType.label,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          trailing: DropdownButton<TaskRecurrence>(
+            value: recurrenceType,
             underline: const SizedBox.shrink(),
             borderRadius: BorderRadius.circular(16),
-            items: const ['Does not repeat', 'Daily', 'Weekly', 'Monthly']
-                .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+            items: TaskRecurrence.values
+                .map(
+                  (item) =>
+                      DropdownMenuItem(value: item, child: Text(item.label)),
+                )
                 .toList(),
             onChanged: (value) {
-              if (value != null) onRepeatChanged(value);
+              if (value != null) onRecurrenceChanged(value);
             },
           ),
         ),
