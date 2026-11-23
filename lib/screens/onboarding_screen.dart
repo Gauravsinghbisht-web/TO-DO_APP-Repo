@@ -1,7 +1,5 @@
 import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
-
 import '../core/theme/taskflow_theme.dart';
 import 'login_screen.dart';
 

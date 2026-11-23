@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../core/theme/taskflow_theme.dart';
-import 'home_screen.dart';
+import '../providers/auth_provider.dart';
 import 'login_screen.dart';
 
-/// TaskFlow account creation UI. The form is local presentation only.
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -17,6 +17,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+
   bool _showPassword = false;
   bool _showConfirmPassword = false;
   bool _acceptedTerms = true;
@@ -33,6 +34,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
     if (RegExp(r'\d').hasMatch(password)) score++;
     if (RegExp(r'[^A-Za-z0-9]').hasMatch(password)) score++;
+
     return score;
   }
 
@@ -47,14 +49,75 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
+  }
+
+  Future<void> _createAccount() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmController.text;
+
+    if (name.isEmpty) {
+      _showMessage('Please enter your full name.');
+      return;
+    }
+
+    if (email.isEmpty) {
+      _showMessage('Please enter your email address.');
+      return;
+    }
+
+    if (password.isEmpty) {
+      _showMessage('Please enter a password.');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showMessage('Password must contain at least 6 characters.');
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showMessage('Passwords do not match.');
+      return;
+    }
+
+    if (!_acceptedTerms) {
+      _showMessage('Please accept the terms to continue.');
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+
+    final success = await authProvider.signUp(
+      name: name,
+      email: email,
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } else {
+      _showMessage(
+        authProvider.errorMessage ??
+            'Account creation failed. Please try again.',
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final strength = _passwordStrength;
+    final isLoading = context.watch<AuthProvider>().isLoading;
+
     final strengthLabel = switch (strength) {
       0 => 'Not set',
       1 => 'Weak',
@@ -116,21 +179,25 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 28),
                     const _DividerLabel(label: 'OR SIGN UP WITH EMAIL'),
                     const SizedBox(height: 24),
+
                     _FieldLabel(label: 'Full Name'),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _nameController,
+                      enabled: !isLoading,
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         hintText: 'e.g. Alexa Chen',
                         prefixIcon: Icon(Icons.person_outline_rounded),
                       ),
                     ),
+
                     const SizedBox(height: 20),
                     _FieldLabel(label: 'Work / Personal Email'),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _emailController,
+                      enabled: !isLoading,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
@@ -138,11 +205,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         prefixIcon: Icon(Icons.mail_outline_rounded),
                       ),
                     ),
+
                     const SizedBox(height: 20),
                     _FieldLabel(label: 'Password'),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _passwordController,
+                      enabled: !isLoading,
                       obscureText: !_showPassword,
                       textInputAction: TextInputAction.next,
                       onChanged: (_) => setState(() {}),
@@ -163,6 +232,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,15 +258,18 @@ class _SignupScreenState extends State<SignupScreen> {
                     Row(
                       children: List.generate(4, (index) {
                         final active = index < strength;
+
                         return Expanded(
                           child: Container(
                             height: 6,
-                            margin: EdgeInsets.only(right: index == 3 ? 0 : 8),
+                            margin: EdgeInsets.only(
+                              right: index == 3 ? 0 : 8,
+                            ),
                             decoration: BoxDecoration(
                               color: active
                                   ? (index == 3
-                                        ? const Color(0xFF4EDEA3)
-                                        : TaskFlowColors.primary)
+                                      ? const Color(0xFF4EDEA3)
+                                      : TaskFlowColors.primary)
                                   : const Color(0xFFE3DFFF),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -204,13 +277,16 @@ class _SignupScreenState extends State<SignupScreen> {
                         );
                       }),
                     ),
+
                     const SizedBox(height: 20),
                     _FieldLabel(label: 'Confirm Password'),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _confirmController,
+                      enabled: !isLoading,
                       obscureText: !_showConfirmPassword,
                       textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _createAccount(),
                       decoration: InputDecoration(
                         hintText: 'Repeat your password',
                         prefixIcon: const Icon(Icons.lock_reset_rounded),
@@ -229,14 +305,18 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 12),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Checkbox.adaptive(
                           value: _acceptedTerms,
-                          onChanged: (value) =>
-                              setState(() => _acceptedTerms = value ?? false),
+                          onChanged: isLoading
+                              ? null
+                              : (value) => setState(
+                                  () => _acceptedTerms = value ?? false,
+                                ),
                           visualDensity: VisualDensity.compact,
                           activeColor: TaskFlowColors.primary,
                           shape: RoundedRectangleBorder(
@@ -276,20 +356,25 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 16),
                     FilledButton.icon(
-                      onPressed: _acceptedTerms
-                          ? () => Navigator.of(context).push<void>(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const HomeScreen(),
+                      onPressed: isLoading ? null : _createAccount,
+                      icon: isLoading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
                               ),
                             )
-                          : () => _showMessage(
-                              'Please accept the terms to continue.',
-                            ),
-                      icon: const Icon(Icons.arrow_forward_rounded),
-                      label: const Text('Create Account'),
+                          : const Icon(Icons.arrow_forward_rounded),
+                      label: Text(
+                        isLoading ? 'Creating account...' : 'Create Account',
+                      ),
                     ),
+
                     const SizedBox(height: 24),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -319,12 +404,12 @@ class _SignupScreenState extends State<SignupScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Instant Sync Enabled',
+                                  'Firebase Authentication Enabled',
                                   style: textTheme.labelLarge,
                                 ),
                                 const SizedBox(height: 3),
                                 Text(
-                                  'Your workspaces seamlessly link across devices.',
+                                  'Your account is securely managed by Firebase.',
                                   style: textTheme.bodySmall,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -335,6 +420,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 22),
                     Wrap(
                       alignment: WrapAlignment.center,
@@ -345,16 +431,20 @@ class _SignupScreenState extends State<SignupScreen> {
                           style: textTheme.bodyMedium,
                         ),
                         TextButton(
-                          onPressed: () => Navigator.of(context).push<void>(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const LoginScreen(),
-                            ),
-                          ),
+                          onPressed: isLoading
+                              ? null
+                              : () => Navigator.of(context).push<void>(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const LoginScreen(),
+                                  ),
+                                ),
                           child: const Text('Log In'),
                         ),
                       ],
                     ),
-                    if (constraints.maxHeight < 620) const SizedBox(height: 4),
+
+                    if (constraints.maxHeight < 620)
+                      const SizedBox(height: 4),
                   ],
                 ),
               ),
@@ -371,40 +461,44 @@ class _SignupBrandMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: 128,
-    height: 128,
-    decoration: BoxDecoration(
-      color: TaskFlowColors.primary,
-      borderRadius: BorderRadius.circular(32),
-      boxShadow: [
-        BoxShadow(
-          color: TaskFlowColors.primary.withValues(alpha: 0.22),
-          blurRadius: 24,
-          offset: const Offset(0, 12),
-        ),
-      ],
-    ),
-    child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        const Center(
-          child: Icon(Icons.check_rounded, color: Colors.white, size: 64),
-        ),
-        Positioned(
-          right: -8,
-          top: -8,
-          child: Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE3DFFF),
-              shape: BoxShape.circle,
+        width: 128,
+        height: 128,
+        decoration: BoxDecoration(
+          color: TaskFlowColors.primary,
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: TaskFlowColors.primary.withValues(alpha: 0.22),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
-  );
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Center(
+              child: Icon(
+                Icons.check_rounded,
+                color: Colors.white,
+                size: 64,
+              ),
+            ),
+            Positioned(
+              right: -8,
+              top: -8,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE3DFFF),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 }
 
 class _FieldLabel extends StatelessWidget {
@@ -414,11 +508,12 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-    label,
-    style: Theme.of(
-      context,
-    ).textTheme.labelLarge?.copyWith(color: TaskFlowColors.secondaryText),
-  );
+        label,
+        style: Theme.of(context)
+            .textTheme
+            .labelLarge
+            ?.copyWith(color: TaskFlowColors.secondaryText),
+      );
 }
 
 class _SocialButton extends StatelessWidget {
@@ -434,15 +529,15 @@ class _SocialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => OutlinedButton.icon(
-    onPressed: onPressed,
-    icon: icon,
-    label: Text(label),
-    style: OutlinedButton.styleFrom(
-      backgroundColor: TaskFlowColors.lavenderContainer,
-      side: BorderSide.none,
-      foregroundColor: TaskFlowColors.mainText,
-    ),
-  );
+        onPressed: onPressed,
+        icon: icon,
+        label: Text(label),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: TaskFlowColors.lavenderContainer,
+          side: BorderSide.none,
+          foregroundColor: TaskFlowColors.mainText,
+        ),
+      );
 }
 
 class _GoogleGlyph extends StatelessWidget {
@@ -450,13 +545,13 @@ class _GoogleGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Text(
-    'G',
-    style: TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-      color: Color(0xFF4285F4),
-    ),
-  );
+        'G',
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF4285F4),
+        ),
+      );
 }
 
 class _DividerLabel extends StatelessWidget {
@@ -466,18 +561,23 @@ class _DividerLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-    children: [
-      const Expanded(child: Divider(color: TaskFlowColors.outlineVariant)),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(color: TaskFlowColors.outline),
-        ),
-      ),
-      const Expanded(child: Divider(color: TaskFlowColors.outlineVariant)),
-    ],
-  );
+        children: [
+          const Expanded(
+            child: Divider(color: TaskFlowColors.outlineVariant),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall
+                  ?.copyWith(color: TaskFlowColors.outline),
+            ),
+          ),
+          const Expanded(
+            child: Divider(color: TaskFlowColors.outlineVariant),
+          ),
+        ],
+      );
 }

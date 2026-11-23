@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,11 +12,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+   await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
 
-    debugPrint('Firebase initialized successfully!');
+debugPrint('Firebase initialized successfully!');
+
+// Require the user to sign in whenever the app starts.
+await FirebaseAuth.instance.signOut();
+
+debugPrint('Previous Firebase session signed out.');
   } catch (error, stackTrace) {
     debugPrint('Firebase initialization failed: $error\n$stackTrace');
     rethrow;

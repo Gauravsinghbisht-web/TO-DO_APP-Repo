@@ -1,10 +1,13 @@
+
+import 'providers/auth_provider.dart' as taskflow_auth;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'core/theme/taskflow_theme.dart';
 import 'data/repositories/task_repository.dart';
 import 'data/services/notification_service.dart';
 import 'providers/task_provider.dart';
+import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
 
@@ -33,18 +36,71 @@ class TaskFlowApp extends StatelessWidget {
       );
     }
 
-    return ChangeNotifierProvider<TaskProvider>(
-      create: (_) => TaskProvider(
-        repository: taskRepository,
-        reminderService: reminderService,
-      ),
+    return MultiProvider(
+      providers: [
+       ChangeNotifierProvider<taskflow_auth.AuthProvider>(
+        create: (_) => taskflow_auth.AuthProvider(),
+       ),
+        ChangeNotifierProvider<TaskProvider>(
+          create: (_) => TaskProvider(
+            repository: taskRepository,
+            reminderService: reminderService,
+          ),
+        ),
+      ],
       child: MaterialApp(
         title: 'TaskFlow',
         debugShowCheckedModeBanner: false,
         theme: TaskFlowTheme.light,
-        home: const SplashScreen(),
-        routes: {'/login': (_) => const LoginScreen()},
+        home: const AuthGate(),
+        routes: {
+          '/login': (_) => const LoginScreen(),
+        },
       ),
+    );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        debugPrint(
+          'TASKFLOW AUTH GATE: '
+          'State = ${snapshot.connectionState}, '
+          'User = ${snapshot.data?.email}',
+        );
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          debugPrint(
+            'TASKFLOW AUTH GATE ERROR: ${snapshot.error}',
+          );
+
+          return const Scaffold(
+            body: Center(
+              child: Text('Could not check your login status.'),
+            ),
+          );
+        }
+
+        if (snapshot.data != null) {
+          return const HomeScreen();
+        }
+
+        return const SplashScreen();
+      },
     );
   }
 }
@@ -55,7 +111,8 @@ class _StorageErrorScreen extends StatefulWidget {
   final Future<void> Function()? onRetry;
 
   @override
-  State<_StorageErrorScreen> createState() => _StorageErrorScreenState();
+  State<_StorageErrorScreen> createState() =>
+      _StorageErrorScreenState();
 }
 
 class _StorageErrorScreenState extends State<_StorageErrorScreen> {
@@ -63,47 +120,60 @@ class _StorageErrorScreenState extends State<_StorageErrorScreen> {
 
   Future<void> _retry() async {
     final retry = widget.onRetry;
+
     if (retry == null || _retrying) return;
+
     setState(() => _retrying = true);
+
     await retry();
-    if (mounted) setState(() => _retrying = false);
+
+    if (mounted) {
+      setState(() => _retrying = false);
+    }
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.storage_rounded, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              'We couldn’t load your tasks',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Please try again. Your saved tasks have not been removed.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: _retrying || widget.onRetry == null ? null : _retry,
-              icon: _retrying
-                  ? const SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.refresh_rounded),
-              label: Text(_retrying ? 'Trying again…' : 'Try Again'),
-            ),
-          ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.storage_rounded, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                'We couldn’t load your tasks',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please try again. Your saved tasks have not been removed.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed:
+                    _retrying || widget.onRetry == null ? null : _retry,
+                icon: _retrying
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.refresh_rounded),
+                label: Text(
+                  _retrying ? 'Trying again…' : 'Try Again',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
