@@ -1,12 +1,16 @@
 
-
 import 'package:firebase_auth/firebase_auth.dart';
+import 'firestore_service.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth;
+  final FirestoreService _firestoreService;
 
-  AuthService({FirebaseAuth? firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  AuthService({
+    FirebaseAuth? firebaseAuth,
+    FirestoreService? firestoreService,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _firestoreService = firestoreService ?? FirestoreService();
 
   // Get the currently logged-in user.
   User? get currentUser => _firebaseAuth.currentUser;
@@ -27,8 +31,20 @@ class AuthService {
       password: password,
     );
 
-    // Save the user's name in their Firebase Auth profile.
-    await credential.user?.updateDisplayName(name.trim());
+    final user = credential.user;
+
+    if (user == null) {
+      throw Exception('User account could not be created.');
+    }
+
+    // Save the user's name in Firebase Authentication.
+    await user.updateDisplayName(name.trim());
+
+    // Save the user's profile in Cloud Firestore.
+    await _firestoreService.saveUserProfile(
+      name: name.trim(),
+      email: user.email ?? email.trim(),
+    );
 
     return credential;
   }

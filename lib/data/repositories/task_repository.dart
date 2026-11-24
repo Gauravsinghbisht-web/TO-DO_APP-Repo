@@ -1,9 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 import '../models/task.dart';
 
-/// Stores tasks in Hive for normal app use and supports memory data in tests.
+/// Stores tasks locally and keeps each signed-in user's tasks separate.
 class TaskRepository {
   TaskRepository({List<Task>? initialTasks})
     : _box = null,
@@ -15,10 +16,12 @@ class TaskRepository {
   static const _settingsBoxName = 'taskflow_settings';
   static const _seededKey = 'sample_tasks_seeded';
 
-  final Box<dynamic>? _box;
+  Box<dynamic>? _box;
   final List<Task> _tasks;
 
-  /// Opens Hive and loads saved tasks before the app is shown.
+  String? _activeUserId;
+
+  /// Opens Hive and loads guest tasks before the app is shown.
   static Future<TaskRepository> open({String? directory}) async {
     if (directory == null) {
       await Hive.initFlutter();
@@ -29,37 +32,70 @@ class TaskRepository {
     final tasksBox = await Hive.openBox<dynamic>(_tasksBoxName);
     final settingsBox = await Hive.openBox<dynamic>(_settingsBoxName);
 
-    // Seed sample tasks once. If the user later deletes every task, they stay
-    // deleted after the next launch.
+    // Seed guest sample tasks only once.
     if (settingsBox.get(_seededKey) != true) {
       if (tasksBox.isEmpty) {
         final samples = _createSampleTasks();
+
         await tasksBox.putAll({
           for (final task in samples) task.id: _toMap(task),
         });
       }
+
       await settingsBox.put(_seededKey, true);
     }
 
-    final tasks = tasksBox.values
-        .map((value) => _fromMap(Map<dynamic, dynamic>.from(value as Map)))
-        .toList();
+    final tasks = _readTasks(tasksBox);
+
     return TaskRepository._persistent(tasksBox, tasks);
   }
 
-  /// Returns a read-only copy of the repository's loaded task cache.
+  /// Switches local storage to the selected Firebase user's task box.
+  ///
+  /// Passing null switches back to the existing guest task box.
+  Future<void> switchUser(String? userId) async {
+    // In-memory repositories are used by tests.
+    if (_box == null) return;
+
+    final normalizedUserId =
+        userId == null || userId.trim().isEmpty ? null : userId.trim();
+
+    if (_activeUserId == normalizedUserId) return;
+
+    final boxName = normalizedUserId == null
+        ? _tasksBoxName
+        : '${_tasksBoxName}_${normalizedUserId}';
+
+    final userBox = await Hive.openBox<dynamic>(boxName);
+
+    _box = userBox;
+    _activeUserId = normalizedUserId;
+
+    _tasks
+      ..clear()
+      ..addAll(_readTasks(userBox));
+  }
+
+  static List<Task> _readTasks(Box<dynamic> box) {
+    return box.values
+        .map((value) => _fromMap(Map<dynamic, dynamic>.from(value as Map)))
+        .toList();
+  }
+
+  /// Returns a read-only copy of the loaded task cache.
   List<Task> getAllTasks() => List.unmodifiable(_tasks);
 
-  /// Adds a task and prevents the same task ID from being added twice.
+  /// Adds a task and prevents duplicate task IDs.
   Future<void> addTask(Task task) async {
     if (_tasks.any((savedTask) => savedTask.id == task.id)) {
       throw StateError('A task with ID ${task.id} already exists.');
     }
+
     await _box?.put(task.id, _toMap(task));
     _tasks.add(task);
   }
 
-  /// Replaces an existing task. Returns false when the task was not found.
+  /// Replaces an existing task.
   Future<bool> updateTask(Task task) async {
     final index = _tasks.indexWhere((savedTask) => savedTask.id == task.id);
     if (index == -1) return false;
@@ -69,7 +105,7 @@ class TaskRepository {
     return true;
   }
 
-  /// Removes a task by ID. Returns false when the task was not found.
+  /// Removes a task by ID.
   Future<bool> deleteTask(String taskId) async {
     final index = _tasks.indexWhere((task) => task.id == taskId);
     if (index == -1) return false;
@@ -83,6 +119,7 @@ class TaskRepository {
   Future<bool> toggleTaskCompletion(String taskId) async {
     final task = _tasks.where((item) => item.id == taskId).firstOrNull;
     if (task == null) return false;
+
     return updateTask(task.copyWith(isCompleted: !task.isCompleted));
   }
 
@@ -95,7 +132,10 @@ class TaskRepository {
     'dueDate': task.dueDate?.toIso8601String(),
     'dueTime': task.dueTime == null
         ? null
-        : {'hour': task.dueTime!.hour, 'minute': task.dueTime!.minute},
+        : {
+            'hour': task.dueTime!.hour,
+            'minute': task.dueTime!.minute,
+          },
     'reminderEnabled': task.reminderEnabled,
     'reminderMinutesBefore': task.reminderMinutesBefore,
     'recurrenceType': task.recurrenceType.name,
@@ -108,15 +148,18 @@ class TaskRepository {
 
   static Task _fromMap(Map<dynamic, dynamic> map) {
     final priorityName = map['priority'] as String?;
+
     final priority = TaskPriority.values.firstWhere(
       (value) => value.name == priorityName,
       orElse: () => TaskPriority.medium,
     );
+
     final dueTimeMap = map['dueTime'] as Map?;
 
     final dueDate = map['dueDate'] == null
         ? null
         : DateTime.tryParse(map['dueDate'] as String);
+
     return Task(
       id: map['id'] as String,
       title: map['title'] as String? ?? '',
@@ -133,7 +176,9 @@ class TaskRepository {
       reminderEnabled: map['reminderEnabled'] as bool? ?? false,
       reminderMinutesBefore:
           (map['reminderMinutesBefore'] as num?)?.toInt() ?? 15,
-      recurrenceType: TaskRecurrence.fromName(map['recurrenceType'] as String?),
+      recurrenceType: TaskRecurrence.fromName(
+        map['recurrenceType'] as String?,
+      ),
       recurrenceDayOfMonth:
           (map['recurrenceDayOfMonth'] as num?)?.toInt() ?? dueDate?.day,
       parentTaskId: map['parentTaskId'] as String?,
@@ -147,8 +192,10 @@ class TaskRepository {
 
   static List<Task> _createSampleTasks() {
     final now = DateTime.now();
+
     DateTime day(int offset) =>
         DateUtils.dateOnly(now.add(Duration(days: offset)));
+
     return [
       Task(
         title: 'Finalize Q4 mobile app launch checklist',
