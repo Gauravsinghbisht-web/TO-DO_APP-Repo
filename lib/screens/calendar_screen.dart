@@ -1,7 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../core/theme/taskflow_theme.dart';
 import '../data/models/task.dart';
 import '../providers/task_provider.dart';
 import '../widgets/taskflow_bottom_navigation_bar.dart';
@@ -321,80 +321,87 @@ class _CalendarAppBar extends StatelessWidget {
   final VoidCallback onProfile;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: TaskFlowColors.background.withValues(alpha: 0.96),
-    elevation: 1,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: TaskFlowColors.primary,
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: const Icon(
-              Icons.check_rounded,
-              color: Colors.white,
-              size: 23,
-            ),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'TaskFlow',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: TaskFlowColors.primary,
-                  ),
-                ),
-                Text(
-                  destination,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: TaskFlowColors.secondaryText,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            tooltip: 'Search',
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Calendar search will be available later.'),
-                behavior: SnackBarBehavior.floating,
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colors.surface,
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: colors.primary,
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(
+                Icons.check_rounded,
+                color: colors.onPrimary,
+                size: 23,
               ),
             ),
-            icon: const Icon(Icons.search_rounded),
-          ),
-          IconButton(
-            tooltip: 'Notifications',
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('You are all caught up!'),
-                behavior: SnackBarBehavior.floating,
+            const SizedBox(width: 9),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'TaskFlow',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: colors.primary,
+                    ),
+                  ),
+                  Text(
+                    destination,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ),
-            icon: const Icon(Icons.notifications_none_rounded),
-          ),
-          const SizedBox(width: 2),
-          GestureDetector(
-            onTap: onProfile,
-            child: const CircleAvatar(
-              radius: 21,
-              backgroundColor: Color(0xFFE3DFFF),
-              child: Icon(Icons.person_rounded, color: TaskFlowColors.primary),
+            IconButton(
+              tooltip: 'Search',
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Calendar search will be available later.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              ),
+              icon: const Icon(Icons.search_rounded),
             ),
-          ),
-        ],
+            IconButton(
+              tooltip: 'Notifications',
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('You are all caught up!'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              ),
+              icon: const Icon(Icons.notifications_none_rounded),
+            ),
+            const SizedBox(width: 2),
+            GestureDetector(
+              onTap: onProfile,
+              child: CircleAvatar(
+                radius: 21,
+                backgroundColor: colors.primaryContainer,
+                child: Icon(
+                  Icons.person_rounded,
+                  color: colors.onPrimaryContainer,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _MonthCalendarCard extends StatelessWidget {
@@ -420,6 +427,7 @@ class _MonthCalendarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final firstDay = DateTime(displayedMonth.year, displayedMonth.month);
     final mondayOffset = (firstDay.weekday + 6) % 7;
     final gridStart = firstDay.subtract(Duration(days: mondayOffset));
@@ -436,11 +444,11 @@ class _MonthCalendarCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(compact ? 14 : 18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: TaskFlowColors.mainText.withValues(alpha: 0.04),
+            color: colors.shadow.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -465,14 +473,14 @@ class _MonthCalendarCard extends StatelessWidget {
                     horizontal: 10,
                     vertical: 6,
                   ),
-                  decoration: const ShapeDecoration(
-                    color: Color(0xFFE9E5FF),
-                    shape: StadiumBorder(),
+                  decoration: ShapeDecoration(
+                    color: colors.primaryContainer,
+                    shape: const StadiumBorder(),
                   ),
                   child: Text(
                     'Autumn Sprint',
                     style: textTheme.labelSmall?.copyWith(
-                      color: TaskFlowColors.primary,
+                      color: colors.onPrimaryContainer,
                     ),
                   ),
                 ),
@@ -522,7 +530,9 @@ class _WeekHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
     return Row(
       children: [
         for (final day in days)
@@ -531,7 +541,7 @@ class _WeekHeader extends StatelessWidget {
               child: Text(
                 day,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: TaskFlowColors.secondaryText,
+                  color: colors.onSurfaceVariant,
                 ),
               ),
             ),
@@ -558,13 +568,14 @@ class _CalendarDayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final selected = DateUtils.isSameDay(date, selectedDate);
     final today = DateUtils.isSameDay(date, DateTime.now());
     final currentMonth =
         date.month == displayedMonth.month && date.year == displayedMonth.year;
     final taskColors = tasks
         .where((task) => DateUtils.isSameDay(task.date, date))
-        .map(_taskColor)
+        .map((task) => _taskColor(task, colors))
         .toSet()
         .take(3)
         .toList();
@@ -579,10 +590,10 @@ class _CalendarDayCell extends StatelessWidget {
             width: 40,
             height: 44,
             decoration: BoxDecoration(
-              color: selected ? TaskFlowColors.primary : Colors.transparent,
+              color: selected ? colors.primary : Colors.transparent,
               shape: BoxShape.circle,
               border: today && !selected
-                  ? Border.all(color: TaskFlowColors.primary, width: 1.5)
+                  ? Border.all(color: colors.primary, width: 1.5)
                   : null,
             ),
             child: Column(
@@ -592,10 +603,10 @@ class _CalendarDayCell extends StatelessWidget {
                   '${date.day}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: selected
-                        ? Colors.white
+                        ? colors.onPrimary
                         : currentMonth
-                        ? TaskFlowColors.mainText
-                        : TaskFlowColors.outlineVariant,
+                        ? colors.onSurface
+                        : colors.onSurface.withValues(alpha: 0.38),
                     fontWeight: selected || today ? FontWeight.w700 : null,
                   ),
                 ),
@@ -612,7 +623,7 @@ class _CalendarDayCell extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 1),
                           decoration: BoxDecoration(
                             color: selected
-                                ? color.withValues(alpha: 0.9)
+                                ? colors.onPrimary.withValues(alpha: 0.9)
                                 : color,
                             shape: BoxShape.circle,
                           ),
@@ -633,23 +644,27 @@ class _CalendarLegend extends StatelessWidget {
   const _CalendarLegend();
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      color: TaskFlowColors.lavenderContainer,
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 18,
-      runSpacing: 8,
-      children: const [
-        _LegendItem(label: 'Work', color: TaskFlowColors.primary),
-        _LegendItem(label: 'High Priority', color: Color(0xFFBA1A1A)),
-        _LegendItem(label: 'Wellness', color: TaskFlowColors.tertiary),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 18,
+        runSpacing: 8,
+        children: [
+          _LegendItem(label: 'Work', color: colors.primary),
+          _LegendItem(label: 'High Priority', color: colors.error),
+          _LegendItem(label: 'Wellness', color: colors.tertiary),
+        ],
+      ),
+    );
+  }
 }
 
 class _LegendItem extends StatelessWidget {
@@ -659,23 +674,27 @@ class _LegendItem extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Container(
-        width: 9,
-        height: 9,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      ),
-      const SizedBox(width: 7),
-      Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelMedium?.copyWith(color: TaskFlowColors.secondaryText),
-      ),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 9,
+          height: 9,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 7),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _SelectedDayHeading extends StatelessWidget {
@@ -691,6 +710,7 @@ class _SelectedDayHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final localizations = MaterialLocalizations.of(context);
     final totalHours = totalMinutes ~/ 60;
     final remainingMinutes = totalMinutes % 60;
@@ -699,6 +719,7 @@ class _SelectedDayHeading extends StatelessWidget {
         : remainingMinutes == 0
         ? '${totalHours}h total'
         : '${totalHours}h ${remainingMinutes}m total';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -717,14 +738,14 @@ class _SelectedDayHeading extends StatelessWidget {
                   horizontal: 12,
                   vertical: 7,
                 ),
-                decoration: const ShapeDecoration(
-                  color: Color(0xFFE9E5FF),
-                  shape: StadiumBorder(),
+                decoration: ShapeDecoration(
+                  color: colors.primaryContainer,
+                  shape: const StadiumBorder(),
                 ),
                 child: Text(
                   totalLabel,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: TaskFlowColors.primary,
+                    color: colors.onPrimaryContainer,
                   ),
                 ),
               ),
@@ -733,9 +754,9 @@ class _SelectedDayHeading extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           '$taskCount scheduled ${taskCount == 1 ? 'activity' : 'activities'} ${DateUtils.isSameDay(date, DateTime.now()) ? 'today' : 'on this date'}',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: TaskFlowColors.secondaryText),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -749,18 +770,20 @@ class _ScheduledTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _taskColor(task);
+    final colors = Theme.of(context).colorScheme;
+    final color = _taskColor(task, colors);
     final priority = task.isHighPriority;
     final endTime = _addMinutes(task.start, task.durationMinutes);
     final textTheme = Theme.of(context).textTheme;
+
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: TaskFlowColors.mainText.withValues(alpha: 0.035),
+            color: colors.shadow.withValues(alpha: 0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -788,8 +811,8 @@ class _ScheduledTaskCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: priority
-                                ? const Color(0xFFFFE0DD)
-                                : const Color(0xFFE3DFFF),
+                                ? colors.errorContainer
+                                : colors.primaryContainer,
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Text(
@@ -798,8 +821,8 @@ class _ScheduledTaskCard extends StatelessWidget {
                                 : task.category.toUpperCase(),
                             style: textTheme.labelSmall?.copyWith(
                               color: priority
-                                  ? const Color(0xFFBA1A1A)
-                                  : TaskFlowColors.primary,
+                                  ? colors.onErrorContainer
+                                  : colors.onPrimaryContainer,
                             ),
                           ),
                         ),
@@ -807,7 +830,7 @@ class _ScheduledTaskCard extends StatelessWidget {
                           Text(
                             task.tag,
                             style: textTheme.labelMedium?.copyWith(
-                              color: TaskFlowColors.secondaryText,
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                       ],
@@ -816,7 +839,12 @@ class _ScheduledTaskCard extends StatelessWidget {
                     Text(task.title, style: textTheme.titleLarge),
                     if (task.description.isNotEmpty) ...[
                       const SizedBox(height: 4),
-                      Text(task.description, style: textTheme.bodyMedium),
+                      Text(
+                        task.description,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                     const SizedBox(height: 12),
                     Wrap(
@@ -848,8 +876,11 @@ class _ScheduledTaskCard extends StatelessWidget {
               padding: const EdgeInsets.only(right: 16),
               child: CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFE9E5FF),
-                child: Icon(Icons.check_rounded, color: color),
+                backgroundColor: colors.primaryContainer,
+                child: Icon(
+                  Icons.check_rounded,
+                  color: colors.onPrimaryContainer,
+                ),
               ),
             ),
           ],
@@ -865,39 +896,45 @@ class _NoScheduledTasks extends StatelessWidget {
   final VoidCallback onAddTask;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(24),
-    decoration: BoxDecoration(
-      color: TaskFlowColors.lavenderContainer,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Column(
-      children: [
-        const Icon(
-          Icons.event_available_rounded,
-          color: TaskFlowColors.primary,
-          size: 36,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Nothing scheduled',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Enjoy the open space or add a task for this day.',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 16),
-        FilledButton.tonalIcon(
-          onPressed: onAddTask,
-          icon: const Icon(Icons.add_rounded),
-          label: const Text('Add Task'),
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.event_available_rounded,
+            color: colors.primary,
+            size: 36,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Nothing scheduled',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Enjoy the open space or add a task for this day.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton.tonalIcon(
+            onPressed: onAddTask,
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Add Task'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _OtherDestination extends StatelessWidget {
@@ -906,33 +943,40 @@ class _OtherDestination extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          Icons.auto_awesome_outlined,
-          color: TaskFlowColors.primary,
-          size: 44,
-        ),
-        const SizedBox(height: 12),
-        Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 6),
-        Text(
-          'This section will be available soon.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_awesome_outlined,
+            color: colors.primary,
+            size: 44,
+          ),
+          const SizedBox(height: 12),
+          Text(title, style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: 6),
+          Text(
+            'This section will be available soon.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-Color _taskColor(_CalendarTask task) => task.isHighPriority
-    ? const Color(0xFFBA1A1A)
+Color _taskColor(_CalendarTask task, ColorScheme colors) =>
+    task.isHighPriority
+    ? colors.error
     : switch (task.category) {
-        'Wellness' => TaskFlowColors.tertiary,
-        'Design' || 'Meeting' => TaskFlowColors.primaryContainer,
-        _ => TaskFlowColors.primary,
+        'Wellness' => colors.tertiary,
+        'Design' || 'Meeting' => colors.primaryContainer,
+        _ => colors.primary,
       };
 
 TimeOfDay _addMinutes(TimeOfDay time, int minutes) {

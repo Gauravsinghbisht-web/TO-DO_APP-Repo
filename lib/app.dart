@@ -3,10 +3,12 @@ import 'providers/auth_provider.dart' as taskflow_auth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'core/theme/taskflow_theme.dart';
 import 'data/repositories/task_repository.dart';
 import 'data/services/notification_service.dart';
 import 'providers/task_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
@@ -38,23 +40,37 @@ class TaskFlowApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-       ChangeNotifierProvider<taskflow_auth.AuthProvider>(
-        create: (_) => taskflow_auth.AuthProvider(),
-       ),
-        ChangeNotifierProvider<TaskProvider>(
-          create: (_) => TaskProvider(
-            repository: taskRepository,
-            reminderService: reminderService,
-          ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(),
+        ),
+        ChangeNotifierProvider<taskflow_auth.AuthProvider>(
+          create: (_) => taskflow_auth.AuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TaskProvider(),
         ),
       ],
-      child: MaterialApp(
-        title: 'TaskFlow',
-        debugShowCheckedModeBanner: false,
-        theme: TaskFlowTheme.light,
-        home: const AuthGate(),
-        routes: {
-          '/login': (_) => const LoginScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'TaskFlow',
+            debugShowCheckedModeBanner: false,
+
+            // Light theme
+            theme: TaskFlowTheme.light,
+
+            // Dark theme
+            darkTheme: TaskFlowTheme.dark,
+
+            // Selected theme mode
+            themeMode: themeProvider.themeMode,
+
+            home: const AuthGate(),
+
+            routes: {
+              '/login': (_) => const LoginScreen(),
+            },
+          );
         },
       ),
     );

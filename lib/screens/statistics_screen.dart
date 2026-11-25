@@ -1,7 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../core/theme/taskflow_theme.dart';
 import '../data/models/task.dart';
 import '../providers/task_provider.dart';
 import '../widgets/taskflow_bottom_navigation_bar.dart';
@@ -33,35 +33,43 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   _StatisticsSnapshot _snapshotFor(List<Task> allTasks) {
     final now = DateTime.now();
+
     final start = switch (_selectedRange) {
-      0 => DateUtils.dateOnly(now).subtract(Duration(days: now.weekday - 1)),
+      0 => DateUtils.dateOnly(now).subtract(
+          Duration(days: now.weekday - 1),
+        ),
       1 => DateTime(now.year, now.month),
       _ => DateTime(1),
     };
+
     final tasks = allTasks
         .where((task) => !task.createdAt.isBefore(start))
         .toList();
+
     final completed = tasks.where((task) => task.isCompleted).length;
     final pending = tasks.length - completed;
+
     final activity = List<int>.generate(7, (index) {
       final weekday = index + 1;
       return tasks
           .where(
-            (task) => task.isCompleted && task.createdAt.weekday == weekday,
+            (task) =>
+                task.isCompleted && task.createdAt.weekday == weekday,
           )
           .length;
     });
+
     const categoryKeys = ['Work', 'Personal', 'Design', 'Other'];
-    final categories = categoryKeys
-        .map(
-          (key) => tasks.where((task) {
-            if (key == 'Other') {
-              return !categoryKeys.take(3).contains(task.category);
-            }
-            return task.category == key;
-          }).length,
-        )
-        .toList();
+
+    final categories = categoryKeys.map((key) {
+      return tasks.where((task) {
+        if (key == 'Other') {
+          return !categoryKeys.take(3).contains(task.category);
+        }
+        return task.category == key;
+      }).length;
+    }).toList();
+
     return _StatisticsSnapshot(
       completedTasks: completed,
       productivity: tasks.isEmpty
@@ -72,7 +80,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       extraCompletedToday: tasks
           .where(
             (task) =>
-                task.isCompleted && DateUtils.isSameDay(task.createdAt, now),
+                task.isCompleted &&
+                DateUtils.isSameDay(task.createdAt, now),
           )
           .length,
       focusStreak: 0,
@@ -93,6 +102,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     final titles = ['Home', 'Tasks', 'Calendar', 'Statistics', 'Profile'];
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -121,6 +131,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget _buildStatistics(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final snapshot = _snapshotFor(context.watch<TaskProvider>().tasks);
+
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -160,7 +171,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 _DateRangeSelector(
                   labels: _rangeLabels,
                   selectedIndex: _selectedRange,
-                  onSelected: (index) => setState(() => _selectedRange = index),
+                  onSelected: (index) =>
+                      setState(() => _selectedRange = index),
                 ),
                 const SizedBox(height: 22),
                 if (snapshot.completedTasks + snapshot.pendingTasks == 0)
@@ -179,7 +191,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     width: (constraints.maxWidth - 40).clamp(0.0, 760.0),
                   ),
                   const SizedBox(height: 22),
-                  _ActivityCard(snapshot: snapshot, rangeIndex: _selectedRange),
+                  _ActivityCard(
+                    snapshot: snapshot,
+                    rangeIndex: _selectedRange,
+                  ),
                   const SizedBox(height: 22),
                   _CategoryDistributionCard(snapshot: snapshot),
                   const SizedBox(height: 22),
@@ -197,7 +212,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   Future<void> _addTask() async {
     await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(builder: (_) => const AddTaskScreen()),
+      MaterialPageRoute<void>(
+        builder: (_) => const AddTaskScreen(),
+      ),
     );
   }
 
@@ -235,7 +252,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       MaterialPageRoute<void>(
         builder: (_) => ProfileScreen(
           onHomeSelected: () {
-            if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
             if (widget.onHomeSelected != null) {
               widget.onHomeSelected!();
             } else if (Navigator.of(context).canPop()) {
@@ -243,7 +262,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             }
           },
           onTasksSelected: () {
-            if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
             if (widget.onTasksSelected != null) {
               widget.onTasksSelected!();
             } else {
@@ -251,7 +272,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             }
           },
           onCalendarSelected: () {
-            if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
             if (widget.onCalendarSelected != null) {
               widget.onCalendarSelected!();
             } else {
@@ -259,7 +282,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             }
           },
           onStatisticsSelected: () {
-            if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
             setState(() => _selectedDestination = 3);
           },
         ),
@@ -269,7 +294,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 }
@@ -307,85 +335,103 @@ class _StatisticsSnapshot {
 }
 
 class _StatisticsAppBar extends StatelessWidget {
-  const _StatisticsAppBar({required this.destination, required this.onProfile});
+  const _StatisticsAppBar({
+    required this.destination,
+    required this.onProfile,
+  });
 
   final String destination;
   final VoidCallback onProfile;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: TaskFlowColors.background.withValues(alpha: 0.96),
-    elevation: 1,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: TaskFlowColors.primary,
-              borderRadius: BorderRadius.circular(11),
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colors.surface,
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 10,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: colors.primary,
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(
+                Icons.check_rounded,
+                color: colors.onPrimary,
+                size: 23,
+              ),
             ),
-            child: const Icon(
-              Icons.check_rounded,
-              color: Colors.white,
-              size: 23,
-            ),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'TaskFlow',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: TaskFlowColors.primary,
+            const SizedBox(width: 9),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'TaskFlow',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: colors.primary,
+                        ),
                   ),
-                ),
-                Text(
-                  destination,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: TaskFlowColors.secondaryText,
+                  Text(
+                    destination,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                   ),
+                ],
+              ),
+            ),
+            IconButton(
+              tooltip: 'Search',
+              onPressed: () => _showAppBarMessage(
+                context,
+                'Statistics search will be available later.',
+              ),
+              icon: const Icon(Icons.search_rounded),
+            ),
+            IconButton(
+              tooltip: 'Notifications',
+              onPressed: () => _showAppBarMessage(
+                context,
+                'You are all caught up!',
+              ),
+              icon: const Icon(Icons.notifications_none_rounded),
+            ),
+            const SizedBox(width: 2),
+            GestureDetector(
+              onTap: onProfile,
+              child: CircleAvatar(
+                radius: 21,
+                backgroundColor: colors.primaryContainer,
+                child: Icon(
+                  Icons.person_rounded,
+                  color: colors.onPrimaryContainer,
                 ),
-              ],
+              ),
             ),
-          ),
-          IconButton(
-            tooltip: 'Search',
-            onPressed: () => _showAppBarMessage(
-              context,
-              'Statistics search will be available later.',
-            ),
-            icon: const Icon(Icons.search_rounded),
-          ),
-          IconButton(
-            tooltip: 'Notifications',
-            onPressed: () =>
-                _showAppBarMessage(context, 'You are all caught up!'),
-            icon: const Icon(Icons.notifications_none_rounded),
-          ),
-          const SizedBox(width: 2),
-          GestureDetector(
-            onTap: onProfile,
-            child: const CircleAvatar(
-              radius: 21,
-              backgroundColor: Color(0xFFE3DFFF),
-              child: Icon(Icons.person_rounded, color: TaskFlowColors.primary),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 void _showAppBarMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+    ),
   );
 }
 
@@ -401,67 +447,73 @@ class _DateRangeSelector extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(4),
-    decoration: BoxDecoration(
-      color: const Color(0xFFEFEBFF),
-      borderRadius: BorderRadius.circular(28),
-    ),
-    child: Row(
-      children: [
-        for (var index = 0; index < labels.length; index++)
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: Material(
-                color: selectedIndex == index
-                    ? TaskFlowColors.primary
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(24),
-                child: InkWell(
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          for (var index = 0; index < labels.length; index++)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Material(
+                  color: selectedIndex == index
+                      ? colors.primary
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(24),
-                  onTap: () => onSelected(index),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 4,
-                    ),
-                    child: Text(
-                      labels[index],
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: selectedIndex == index
-                            ? Colors.white
-                            : TaskFlowColors.secondaryText,
-                        fontWeight: FontWeight.w600,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: () => onSelected(index),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 4,
+                      ),
+                      child: Text(
+                        labels[index],
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: selectedIndex == index
+                                  ? colors.onPrimary
+                                  : colors.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 class _MetricGrid extends StatelessWidget {
-  const _MetricGrid({required this.snapshot, required this.width});
+  const _MetricGrid({
+    required this.snapshot,
+    required this.width,
+  });
 
   final _StatisticsSnapshot snapshot;
   final double width;
 
   @override
   Widget build(BuildContext context) {
-    final gap = 12.0;
+    const gap = 12.0;
     final cardWidth = (width - gap) / 2;
-    // Narrow cards wrap supporting text. Scale their height with the system
-    // text scale so accessibility text sizes have room as well.
     final baseCardHeight = cardWidth < 180 ? 174.0 : 158.0;
     final cardHeight =
         baseCardHeight * MediaQuery.textScalerOf(context).scale(1.0);
+
     return Wrap(
       spacing: gap,
       runSpacing: gap,
@@ -497,41 +549,46 @@ class _ProductivityMetric extends StatelessWidget {
   final _StatisticsSnapshot snapshot;
 
   @override
-  Widget build(BuildContext context) => _MetricCard(
-    background: const Color(0xFFE9E5FF),
-    icon: Icons.pie_chart_outline_rounded,
-    iconColor: TaskFlowColors.primary,
-    topLabel: 'Current',
-    topLabelColor: TaskFlowColors.tertiary,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          '${snapshot.productivity}%',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          'Completion Rate',
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: TaskFlowColors.secondaryText,
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _MetricCard(
+      background: colors.primaryContainer,
+      icon: Icons.pie_chart_outline_rounded,
+      iconColor: colors.onPrimaryContainer,
+      topLabel: 'Current',
+      topLabelColor: colors.onPrimaryContainer,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            '${snapshot.productivity}%',
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.onPrimaryContainer,
+                ),
           ),
-        ),
-        const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(
-            value: snapshot.productivity / 100,
-            minHeight: 6,
-            backgroundColor: const Color(0xFFDAD6FF),
-            color: TaskFlowColors.primary,
+          Text(
+            'Completion Rate',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: colors.onPrimaryContainer,
+                ),
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: snapshot.productivity / 100,
+              minHeight: 6,
+              backgroundColor: colors.surface.withValues(alpha: 0.4),
+              color: colors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _CompletedMetric extends StatelessWidget {
@@ -540,48 +597,57 @@ class _CompletedMetric extends StatelessWidget {
   final _StatisticsSnapshot snapshot;
 
   @override
-  Widget build(BuildContext context) => _MetricCard(
-    background: const Color(0xFFEFEBFF),
-    icon: Icons.task_alt_rounded,
-    iconColor: TaskFlowColors.tertiary,
-    topLabel: 'On Track',
-    topLabelColor: TaskFlowColors.tertiary,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          '${snapshot.completedTasks}',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          'Tasks Done',
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: TaskFlowColors.secondaryText,
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _MetricCard(
+      background: colors.tertiaryContainer,
+      icon: Icons.task_alt_rounded,
+      iconColor: colors.onTertiaryContainer,
+      topLabel: 'On Track',
+      topLabelColor: colors.onTertiaryContainer,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            '${snapshot.completedTasks}',
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.onTertiaryContainer,
+                ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            const Icon(
-              Icons.done_all_rounded,
-              size: 16,
-              color: TaskFlowColors.tertiary,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              '${snapshot.extraCompletedToday} created today',
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium?.copyWith(color: TaskFlowColors.tertiary),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
+          Text(
+            'Tasks Done',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: colors.onTertiaryContainer,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Icon(
+                Icons.done_all_rounded,
+                size: 16,
+                color: colors.onTertiaryContainer,
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  '${snapshot.extraCompletedToday} created today',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: colors.onTertiaryContainer,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _PendingMetric extends StatelessWidget {
@@ -590,52 +656,57 @@ class _PendingMetric extends StatelessWidget {
   final _StatisticsSnapshot snapshot;
 
   @override
-  Widget build(BuildContext context) => _MetricCard(
-    background: TaskFlowColors.lavenderContainer,
-    icon: Icons.pending_actions_rounded,
-    iconColor: TaskFlowColors.secondaryText,
-    topLabel: 'Active',
-    topLabelColor: TaskFlowColors.secondaryText,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          '${snapshot.pendingTasks}',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        Text(
-          'Pending Tasks',
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: TaskFlowColors.secondaryText,
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _MetricCard(
+      background: colors.secondaryContainer,
+      icon: Icons.pending_actions_rounded,
+      iconColor: colors.onSecondaryContainer,
+      topLabel: 'Active',
+      topLabelColor: colors.onSecondaryContainer,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            '${snapshot.pendingTasks}',
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.onSecondaryContainer,
+                ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            const Icon(
-              Icons.schedule_rounded,
-              size: 16,
-              color: TaskFlowColors.secondaryText,
-            ),
-            const SizedBox(width: 5),
-            Flexible(
-              child: Text(
-                'See due dates in Calendar',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: TaskFlowColors.secondaryText,
+          Text(
+            'Pending Tasks',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: colors.onSecondaryContainer,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Icon(
+                Icons.schedule_rounded,
+                size: 16,
+                color: colors.onSecondaryContainer,
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  'See due dates in Calendar',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: colors.onSecondaryContainer,
+                      ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _StreakMetric extends StatelessWidget {
@@ -644,57 +715,64 @@ class _StreakMetric extends StatelessWidget {
   final _StatisticsSnapshot snapshot;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: const Color(0xFFE3DFFF),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.local_fire_department_rounded,
-              color: TaskFlowColors.primary,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              'Personal Best',
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium?.copyWith(color: TaskFlowColors.primary),
-            ),
-          ],
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Not tracked',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            Text(
-              'Focus streak',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: TaskFlowColors.secondaryText,
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primaryContainer,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.local_fire_department_rounded,
+                color: colors.onPrimaryContainer,
               ),
-            ),
-          ],
-        ),
-        Text(
-          'Completion time is not recorded',
-          style: Theme.of(
-            context,
-          ).textTheme.labelMedium?.copyWith(color: TaskFlowColors.primary),
-        ),
-      ],
-    ),
-  );
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Personal Best',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: colors.onPrimaryContainer,
+                      ),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Not tracked',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colors.onPrimaryContainer,
+                    ),
+              ),
+              Text(
+                'Focus streak',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: colors.onPrimaryContainer,
+                    ),
+              ),
+            ],
+          ),
+          Text(
+            'Completion time is not recorded',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: colors.onPrimaryContainer,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _MetricCard extends StatelessWidget {
@@ -715,70 +793,83 @@ class _MetricCard extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: background,
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: TaskFlowColors.mainText.withValues(alpha: 0.035),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.55),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 19, color: iconColor),
-            ),
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                decoration: const ShapeDecoration(
-                  color: Color(0xFFB7F7DF),
-                  shape: StadiumBorder(),
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: colors.surface.withValues(alpha: 0.55),
+                  shape: BoxShape.circle,
                 ),
-                child: Text(
-                  topLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(color: topLabelColor),
+                child: Icon(icon, size: 19, color: iconColor),
+              ),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: ShapeDecoration(
+                    color: colors.surface.withValues(alpha: 0.55),
+                    shape: const StadiumBorder(),
+                  ),
+                  child: Text(
+                    topLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: topLabelColor,
+                        ),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Expanded(child: child),
-      ],
-    ),
-  );
+            ],
+          ),
+          const SizedBox(height: 8),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
 }
 
 class _ActivityCard extends StatelessWidget {
-  const _ActivityCard({required this.snapshot, required this.rangeIndex});
+  const _ActivityCard({
+    required this.snapshot,
+    required this.rangeIndex,
+  });
 
   final _StatisticsSnapshot snapshot;
   final int rangeIndex;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     final maxValue = snapshot.activity.reduce((a, b) => a > b ? a : b);
     final bestIndex = snapshot.activity.indexOf(maxValue);
+
     final bestDay = const [
       'Mon',
       'Tue',
@@ -788,6 +879,7 @@ class _ActivityCard extends StatelessWidget {
       'Sat',
       'Sun',
     ][bestIndex];
+
     return _WhiteCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -806,15 +898,15 @@ class _ActivityCard extends StatelessWidget {
                   horizontal: 11,
                   vertical: 7,
                 ),
-                decoration: const ShapeDecoration(
-                  color: Color(0xFFE9E5FF),
-                  shape: StadiumBorder(),
+                decoration: ShapeDecoration(
+                  color: colors.primaryContainer,
+                  shape: const StadiumBorder(),
                 ),
                 child: Text(
                   'Best: $bestDay ($maxValue)',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: TaskFlowColors.primary,
-                  ),
+                        color: colors.onPrimaryContainer,
+                      ),
                 ),
               ),
             ],
@@ -824,11 +916,11 @@ class _ActivityCard extends StatelessWidget {
             rangeIndex == 0
                 ? 'Completed tasks by weekday this week'
                 : rangeIndex == 1
-                ? 'Completed tasks by weekday this month'
-                : 'Completed tasks by weekday across all time',
+                    ? 'Completed tasks by weekday this month'
+                    : 'Completed tasks by weekday across all time',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: TaskFlowColors.secondaryText,
-            ),
+                  color: colors.onSurfaceVariant,
+                ),
           ),
           const SizedBox(height: 14),
           SizedBox(
@@ -837,10 +929,10 @@ class _ActivityCard extends StatelessWidget {
             child: CustomPaint(
               painter: _ActivityChartPainter(
                 values: snapshot.activity,
-                color: TaskFlowColors.primary,
-                mutedColor: const Color(0xFFBDB8FF),
-                textColor: TaskFlowColors.secondaryText,
-                gridColor: const Color(0xFFE9E5FF),
+                color: colors.primary,
+                mutedColor: colors.primaryContainer,
+                textColor: colors.onSurfaceVariant,
+                gridColor: colors.outlineVariant,
                 textDirection: Directionality.of(context),
               ),
             ),
@@ -868,39 +960,58 @@ class _ActivityChartPainter extends CustomPainter {
   final Color gridColor;
   final TextDirection textDirection;
 
-  static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const _days = [
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
 
   @override
   void paint(Canvas canvas, Size size) {
     if (values.isEmpty || size.isEmpty) return;
+
     const left = 28.0;
     const top = 20.0;
     const bottom = 34.0;
     const right = 4.0;
+
     final plotWidth = size.width - left - right;
     final plotHeight = size.height - top - bottom;
+
     final maxValue = values.reduce((a, b) => a > b ? a : b);
     final axisMax = ((maxValue + 4) ~/ 5) * 5;
     final axis = axisMax == 0 ? 5 : axisMax;
+
     final gridPaint = Paint()
       ..color = gridColor
       ..strokeWidth = 1;
+
     final bestValue = maxValue;
 
     for (var line = 0; line <= 2; line++) {
       final fraction = line / 2;
       final y = top + plotHeight * fraction;
+
       canvas.drawLine(
         Offset(left, y),
         Offset(size.width - right, y),
         gridPaint,
       );
+
       final labelValue = (axis * (1 - fraction)).round();
+
       _drawText(
         canvas,
         '$labelValue',
         Offset(0, y - 7),
-        const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+        const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+        ),
         textColor,
         maxWidth: left - 5,
       );
@@ -908,10 +1019,12 @@ class _ActivityChartPainter extends CustomPainter {
 
     final slotWidth = plotWidth / values.length;
     final barWidth = slotWidth * 0.52;
+
     for (var index = 0; index < values.length; index++) {
       final value = values[index];
       final barHeight = plotHeight * value / axis;
       final centerX = left + slotWidth * (index + 0.5);
+
       final barRect = RRect.fromRectAndRadius(
         Rect.fromLTWH(
           centerX - barWidth / 2,
@@ -921,26 +1034,39 @@ class _ActivityChartPainter extends CustomPainter {
         ),
         const Radius.circular(9),
       );
+
       canvas.drawRRect(
         barRect,
         Paint()..color = value == bestValue ? color : mutedColor,
       );
+
       _drawText(
         canvas,
         '$value',
-        Offset(centerX - slotWidth / 2, top + plotHeight - barHeight - 20),
-        const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        Offset(
+          centerX - slotWidth / 2,
+          top + plotHeight - barHeight - 20,
+        ),
+        const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
         textColor,
         maxWidth: slotWidth,
         align: TextAlign.center,
       );
+
       _drawText(
         canvas,
         _days[index],
-        Offset(centerX - slotWidth / 2, top + plotHeight + 8),
+        Offset(
+          centerX - slotWidth / 2,
+          top + plotHeight + 8,
+        ),
         TextStyle(
           fontSize: 12,
-          fontWeight: value == bestValue ? FontWeight.w700 : FontWeight.w500,
+          fontWeight:
+              value == bestValue ? FontWeight.w700 : FontWeight.w500,
         ),
         value == bestValue ? color : textColor,
         maxWidth: slotWidth,
@@ -961,22 +1087,27 @@ class _ActivityChartPainter extends CustomPainter {
     final painter = TextPainter(
       text: TextSpan(
         text: text,
-        style: style.copyWith(color: color, fontFamily: 'Inter'),
+        style: style.copyWith(
+          color: color,
+          fontFamily: 'Inter',
+        ),
       ),
       textDirection: textDirection,
       textAlign: align,
       maxLines: 1,
     )..layout(maxWidth: maxWidth);
+
     painter.paint(canvas, offset);
   }
 
   @override
-  bool shouldRepaint(covariant _ActivityChartPainter oldDelegate) =>
-      oldDelegate.values != values ||
-      oldDelegate.color != color ||
-      oldDelegate.mutedColor != mutedColor ||
-      oldDelegate.textColor != textColor ||
-      oldDelegate.gridColor != gridColor;
+  bool shouldRepaint(covariant _ActivityChartPainter oldDelegate) {
+    return oldDelegate.values != values ||
+        oldDelegate.color != color ||
+        oldDelegate.mutedColor != mutedColor ||
+        oldDelegate.textColor != textColor ||
+        oldDelegate.gridColor != gridColor;
+  }
 }
 
 class _CategoryDistributionCard extends StatelessWidget {
@@ -984,16 +1115,22 @@ class _CategoryDistributionCard extends StatelessWidget {
 
   final _StatisticsSnapshot snapshot;
 
-  static const _categories = [
-    ('Work Projects', Color(0xFF4D41DF)),
-    ('Personal & Errands', Color(0xFF006947)),
-    ('Design & Creative', Color(0xFF675DF9)),
-    ('Health & Habit', Color(0xFFBDB8FF)),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final total = snapshot.categories.fold<int>(0, (sum, count) => sum + count);
+    final colors = Theme.of(context).colorScheme;
+
+    final categories = [
+      ('Work Projects', colors.primary),
+      ('Personal & Errands', colors.tertiary),
+      ('Design & Creative', colors.secondary),
+      ('Health & Habit', colors.outline),
+    ];
+
+    final total = snapshot.categories.fold<int>(
+      0,
+      (sum, count) => sum + count,
+    );
+
     return _WhiteCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1010,8 +1147,8 @@ class _CategoryDistributionCard extends StatelessWidget {
               Text(
                 '$total tasks classified',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: TaskFlowColors.secondaryText,
-                ),
+                      color: colors.onSurfaceVariant,
+                    ),
               ),
             ],
           ),
@@ -1023,36 +1160,35 @@ class _CategoryDistributionCard extends StatelessWidget {
                 height: 12,
                 child: Row(
                   children: [
-                    for (
-                      var index = 0;
-                      index < snapshot.categories.length;
-                      index++
-                    )
-                      Expanded(
-                        flex: snapshot.categories[index],
-                        child: Container(
-                          margin: EdgeInsets.only(
-                            right: index == snapshot.categories.length - 1
-                                ? 0
-                                : 2,
+                    for (var index = 0;
+                        index < snapshot.categories.length;
+                        index++)
+                      if (snapshot.categories[index] > 0)
+                        Expanded(
+                          flex: snapshot.categories[index],
+                          child: Container(
+                            margin: EdgeInsets.only(
+                              right: index == snapshot.categories.length - 1
+                                  ? 0
+                                  : 2,
+                            ),
+                            color: categories[index].$2,
                           ),
-                          color: _categories[index].$2,
                         ),
-                      ),
                   ],
                 ),
               ),
             ),
           const SizedBox(height: 16),
-          for (var index = 0; index < _categories.length; index++)
+          for (var index = 0; index < categories.length; index++)
             if (snapshot.categories[index] > 0)
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: index == _categories.length - 1 ? 0 : 12,
+                  bottom: index == categories.length - 1 ? 0 : 12,
                 ),
                 child: _CategoryRow(
-                  name: _categories[index].$1,
-                  color: _categories[index].$2,
+                  name: categories[index].$1,
+                  color: categories[index].$2,
                   count: snapshot.categories[index],
                   percent: total == 0
                       ? 0
@@ -1079,29 +1215,42 @@ class _CategoryRow extends StatelessWidget {
   final int percent;
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Container(
-        width: 12,
-        height: 12,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      ),
-      const SizedBox(width: 10),
-      Expanded(child: Text(name, style: Theme.of(context).textTheme.bodyLarge)),
-      Text('$count tasks', style: Theme.of(context).textTheme.bodyMedium),
-      const SizedBox(width: 16),
-      SizedBox(
-        width: 40,
-        child: Text(
-          '$percent%',
-          textAlign: TextAlign.end,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
         ),
-      ),
-    ],
-  );
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            name,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+        Text(
+          '$count tasks',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 40,
+          child: Text(
+            '$percent%',
+            textAlign: TextAlign.end,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _PeakFocusCard extends StatelessWidget {
@@ -1110,92 +1259,100 @@ class _PeakFocusCard extends StatelessWidget {
   final _StatisticsSnapshot snapshot;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFF675DF9), Color(0xFF4D41DF)],
-      ),
-      borderRadius: BorderRadius.circular(22),
-      boxShadow: [
-        BoxShadow(
-          color: TaskFlowColors.primary.withValues(alpha: 0.24),
-          blurRadius: 18,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    ),
-    child: Stack(
-      children: [
-        Positioned(
-          right: -6,
-          bottom: -10,
-          child: Icon(
-            Icons.lightbulb_outline_rounded,
-            size: 100,
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.psychology_alt_rounded,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  'PEAK FOCUS WINDOW',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Colors.white,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'TaskFlow does not record completion times yet, so a peak focus window cannot be calculated.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: Colors.white, height: 1.5),
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Deep work scheduling will be available later.',
-                  ),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: TaskFlowColors.primary,
-                side: BorderSide.none,
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-              ),
-              child: const Text('Schedule Deep Work'),
-            ),
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF675DF9),
+            Color(0xFF4D41DF),
           ],
         ),
-      ],
-    ),
-  );
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.24),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -6,
+            bottom: -10,
+            child: Icon(
+              Icons.lightbulb_outline_rounded,
+              size: 100,
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.psychology_alt_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'PEAK FOCUS WINDOW',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Colors.white,
+                          letterSpacing: 1,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'TaskFlow does not record completion times yet, so a peak focus window cannot be calculated.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.white,
+                      height: 1.5,
+                    ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Deep work scheduling will be available later.',
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: colors.surface,
+                  foregroundColor: colors.primary,
+                  side: BorderSide.none,
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                ),
+                child: const Text('Schedule Deep Work'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AchievementCard extends StatelessWidget {
@@ -1204,50 +1361,57 @@ class _AchievementCard extends StatelessWidget {
   final _StatisticsSnapshot snapshot;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: TaskFlowColors.lavenderContainer,
-      borderRadius: BorderRadius.circular(22),
-    ),
-    child: Row(
-      children: [
-        Container(
-          width: 58,
-          height: 58,
-          decoration: const BoxDecoration(
-            color: Color(0xFF6FFBBE),
-            shape: BoxShape.circle,
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: colors.tertiaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.military_tech_rounded,
+              color: colors.onTertiaryContainer,
+              size: 32,
+            ),
           ),
-          child: const Icon(
-            Icons.military_tech_rounded,
-            color: Color(0xFF006947),
-            size: 32,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  snapshot.achievement,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  snapshot.achievementDescription,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                snapshot.achievement,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                snapshot.achievementDescription,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
+          Icon(
+            Icons.chevron_right_rounded,
+            color: colors.primary,
           ),
-        ),
-        const Icon(Icons.chevron_right_rounded, color: TaskFlowColors.primary),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 class _WhiteCard extends StatelessWidget {
@@ -1256,21 +1420,25 @@ class _WhiteCard extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(22),
-      boxShadow: [
-        BoxShadow(
-          color: TaskFlowColors.mainText.withValues(alpha: 0.035),
-          blurRadius: 9,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: child,
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.06),
+            blurRadius: 9,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 }
 
 class _DestinationPlaceholder extends StatelessWidget {
@@ -1279,23 +1447,30 @@ class _DestinationPlaceholder extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          Icons.auto_awesome_outlined,
-          color: TaskFlowColors.primary,
-          size: 44,
-        ),
-        const SizedBox(height: 12),
-        Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 6),
-        Text(
-          'This section will be available soon.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_awesome_outlined,
+            color: colors.primary,
+            size: 44,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'This section will be available soon.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
 }

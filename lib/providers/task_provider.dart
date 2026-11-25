@@ -1,32 +1,46 @@
-import 'package:flutter/foundation.dart';
 
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import '../data/models/task.dart';
 import '../data/repositories/task_repository.dart';
 import '../data/services/firestore_service.dart';
 import '../data/services/notification_service.dart';
 
-/// Exposes task changes to Flutter widgets and notifies them when data changes.
+/// Exposes task changes and synchronizes local tasks with Firebase.
 class TaskProvider extends ChangeNotifier {
   TaskProvider({
     TaskRepository? repository,
     FirestoreService? firestoreService,
+    FirebaseAuth? auth,
     this.reminderService,
   }) : _repository = repository ?? TaskRepository(),
-       _firestoreService = firestoreService ?? FirestoreService();
+       _firestoreService = firestoreService ?? FirestoreService(),
+       _auth = auth ?? FirebaseAuth.instance {
+    _authSubscription = _auth.authStateChanges().listen((user) {
+      unawaited(_handleAuthChange(user));
+    });
+  }
 
   final TaskRepository _repository;
   final FirestoreService _firestoreService;
+  final FirebaseAuth _auth;
   final TaskReminderService? reminderService;
+
+  StreamSubscription<User?>? _authSubscription;
 
   String? _errorMessage;
   String? _notificationError;
   String? _cloudSyncError;
+
+  bool _isLoadingCloudTasks = false;
 
   final Set<String> _completionOperations = {};
 
   String? get errorMessage => _errorMessage;
   String? get notificationError => _notificationError;
   String? get cloudSyncError => _cloudSyncError;
+  bool get isLoadingCloudTasks => _isLoadingCloudTasks;
 
   List<Task> get tasks => _repository.getAllTasks();
 
@@ -39,6 +53,79 @@ class TaskProvider extends ChangeNotifier {
   int get totalTasks => tasks.length;
   int get completedCount => completedTasks.length;
   int get pendingCount => pendingTasks.length;
+
+  /// Changes local storage when the Firebase account changes.
+  ///
+  /// Downloads cloud tasks and merges them with that account's local tasks.
+  Future<void> _handleAuthChange(User? user) async {
+    final userId = user?.uid;
+
+    _isLoadingCloudTasks = user != null;
+    _cloudSyncError = null;
+
+    try {
+      await _repository.switchUser(userId);
+
+      // Refresh the UI after changing the active local task storage.
+      notifyListeners();
+
+      // A signed-out user uses the guest task box.
+      if (user == null) return;
+
+      final cloudTasks = await _firestoreService.fetchTasks();
+
+      // Ignore an old response if the user changed while downloading.
+      if (_auth.currentUser?.uid != userId) return;
+
+      final cloudTaskIds = cloudTasks.map((task) => task.id).toSet();
+
+      // Download cloud tasks. Cloud versions take priority for matching IDs.
+      for (final cloudTask in cloudTasks) {
+        final existingTask = tasks.where(
+          (task) => task.id == cloudTask.id,
+        );
+
+        if (existingTask.isEmpty) {
+          await _repository.addTask(cloudTask);
+        } else {
+          await _repository.updateTask(cloudTask);
+        }
+      }
+
+      // Upload account-specific local tasks that aren't in Firestore.
+      final localOnlyTasks = tasks
+          .where((task) => !cloudTaskIds.contains(task.id))
+          .toList(growable: false);
+
+      for (final localTask in localOnlyTasks) {
+        if (_auth.currentUser?.uid != userId) return;
+
+        await _firestoreService.addTask(localTask);
+      }
+
+      _cloudSyncError = null;
+
+      debugPrint(
+        'TaskFlow: Firebase sync completed for user $userId. '
+        'Downloaded ${cloudTasks.length} tasks and uploaded '
+        '${localOnlyTasks.length} local tasks.',
+      );
+
+      notifyListeners();
+    } catch (error) {
+      debugPrint('TaskFlow failed to load Firebase tasks: $error');
+
+      if (_auth.currentUser?.uid == userId) {
+        _cloudSyncError =
+            'Could not load your cloud tasks. '
+            'Please check your internet connection and try again.';
+        notifyListeners();
+      }
+    } finally {
+      _isLoadingCloudTasks = false;
+      notifyListeners();
+    }
+  }
 
   // Sync changes to Firestore without losing successful local changes.
   Future<void> _syncCloud(Future<void> Function() operation) async {
@@ -168,7 +255,8 @@ class TaskProvider extends ChangeNotifier {
     } catch (error) {
       debugPrint('TaskFlow failed to update task status: $error');
 
-      _errorMessage = 'We could not update the task status. Please try again.';
+      _errorMessage =
+          'We could not update the task status. Please try again.';
       notifyListeners();
 
       return false;
@@ -301,5 +389,11 @@ class TaskProvider extends ChangeNotifier {
 
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    unawaited(_authSubscription?.cancel());
+    super.dispose();
   }
 }
