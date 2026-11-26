@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/taskflow_bottom_navigation_bar.dart';
 
@@ -25,8 +27,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   int _selectedDestination = 4;
   bool _notifications = true;
-  bool _soundAndHaptics = true;
   bool _calendarSync = true;
+  bool _isPickingProfilePhoto = false;
+  int _photoRefreshVersion = 0;
   String _defaultPriority = 'Medium';
 
   @override
@@ -66,6 +69,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildProfile(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+    final profile = authProvider.profile ?? const <String, dynamic>{};
+
+    final name = (profile['name'] as String?)?.trim().isNotEmpty == true
+        ? (profile['name'] as String).trim()
+        : user?.displayName?.trim().isNotEmpty == true
+            ? user!.displayName!.trim()
+            : 'Your name';
+
+    final email = (profile['email'] as String?) ?? user?.email ?? '';
+    final phone = (profile['phone'] as String?) ?? user?.phoneNumber ?? '';
+
+    final storedPhotoUrl =
+        (profile['photoUrl'] as String?) ?? user?.photoURL ?? '';
+
+    // Refresh the displayed image after a successful upload.
+    final photoUrl = storedPhotoUrl.isEmpty
+        ? ''
+        : '$storedPhotoUrl${storedPhotoUrl.contains('?') ? '&' : '?'}v=$_photoRefreshVersion';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
@@ -75,21 +98,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _ProfileHeroCard(),
+              _ProfileHeroCard(
+                name: name,
+                email: email,
+                phone: phone,
+                photoUrl: photoUrl,
+                loading: authProvider.isProfileLoading,
+                isUploadingPhoto: authProvider.isUploadingProfileImage,
+                isPickingPhoto: _isPickingProfilePhoto,
+                photoUploadProgress:
+                    authProvider.profileImageUploadProgress,
+                onPhotoTap: _chooseProfilePhoto,
+                onEdit: () => _editProfile(name: name, phone: phone),
+              ),
               const SizedBox(height: 24),
               const _SectionHeading(title: 'Preferences'),
               const SizedBox(height: 10),
               _PreferencesCard(
                 themeMode: themeProvider.themeMode,
                 notifications: _notifications,
-                soundAndHaptics: _soundAndHaptics,
                 defaultPriority: _defaultPriority,
                 onThemeChanged: (mode) =>
                     themeProvider.setThemeMode(mode),
                 onNotificationsChanged: (value) =>
                     setState(() => _notifications = value),
-                onSoundChanged: (value) =>
-                    setState(() => _soundAndHaptics = value),
                 onPriorityChanged: (value) => setState(() {
                   if (value != null) _defaultPriority = value;
                 }),
@@ -101,8 +133,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 calendarSync: _calendarSync,
                 onCalendarChanged: (value) =>
                     setState(() => _calendarSync = value),
-                onExport: () =>
-                    _showMessage('Task export will be available later.'),
               ),
               const SizedBox(height: 22),
               const _SectionHeading(title: 'Support & About'),
@@ -116,18 +146,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 22),
-              SizedBox(
-                height: 64,
+              Align(
+                alignment: Alignment.center,
                 child: FilledButton.icon(
                   onPressed: _confirmLogout,
-                  icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Log Out of TaskFlow'),
+                  icon: const Icon(Icons.logout_rounded, size: 18),
+                  label: const Text('Log Out'),
                   style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, 42),
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
                     backgroundColor:
                         Theme.of(context).colorScheme.errorContainer,
                     foregroundColor:
                         Theme.of(context).colorScheme.onErrorContainer,
-                    textStyle: Theme.of(context).textTheme.titleLarge,
+                    textStyle: Theme.of(context).textTheme.labelLarge,
                   ),
                 ),
               ),
@@ -168,7 +200,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         icon: const Icon(Icons.logout_rounded),
         title: const Text('Log out?'),
         content: const Text(
-          'You will return to the sign-in screen. You can sign in again at any time.',
+          'You will return to the sign-in screen. '
+          'You can sign in again at any time.',
         ),
         actions: [
           TextButton(
@@ -184,10 +217,145 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (shouldLogOut == true && mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil<void>(
-        '/login',
-        (route) => false,
+      final success = await context.read<AuthProvider>().signOut();
+
+      if (!mounted) return;
+
+      if (success) {
+        Navigator.of(context).pushNamedAndRemoveUntil<void>(
+          '/login',
+          (route) => false,
+        );
+      } else {
+        _showMessage(
+          context.read<AuthProvider>().errorMessage ?? 'Logout failed.',
+        );
+      }
+    }
+  }
+
+  Future<void> _editProfile({
+    required String name,
+    required String phone,
+  }) async {
+    final nameController = TextEditingController(
+      text: name == 'Your name' ? '' : name,
+    );
+    final phoneController = TextEditingController(text: phone);
+    final formKey = GlobalKey<FormState>();
+
+    final values = await showDialog<(String, String)>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Edit profile'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) =>
+                    value == null || value.trim().isEmpty
+                        ? 'Enter your name'
+                        : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: 'Phone number',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(
+                  dialogContext,
+                  (nameController.text, phoneController.text),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    nameController.dispose();
+    phoneController.dispose();
+
+    if (values == null || !mounted) return;
+
+    final success = await context.read<AuthProvider>().updateUserProfile(
+          name: values.$1,
+          phone: values.$2,
+        );
+
+    if (mounted) {
+      _showMessage(
+        success ? 'Profile updated.' : 'Could not save your profile.',
       );
+    }
+  }
+
+  Future<void> _chooseProfilePhoto() async {
+    if (_isPickingProfilePhoto ||
+        context.read<AuthProvider>().isUploadingProfileImage) {
+      return;
+    }
+
+    setState(() => _isPickingProfilePhoto = true);
+
+    try {
+      final image = await ImagePicker().pickImage(  // it is for pick image from gallery.
+        source: ImageSource.gallery,
+        imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1200,
+      );
+
+      if (image == null || !mounted) return;
+
+      final provider = context.read<AuthProvider>();
+      final uploaded = await provider.uploadProfileImage(image); // it is for upload image from firebase.
+
+      if (!mounted) return;
+
+      if (uploaded) {
+        // Force the profile image widget to load the new image URL.
+        setState(() {
+          _photoRefreshVersion =
+              DateTime.now().millisecondsSinceEpoch;
+        });
+
+        _showMessage('Profile photo updated.');
+      } else {
+        _showMessage(
+          provider.errorMessage ?? 'Could not upload your profile photo.',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showMessage(
+          'Could not select or upload that photo. Please try again.',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isPickingProfilePhoto = false);
+      }
     }
   }
 
@@ -259,14 +427,6 @@ class _ProfileAppBar extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Search',
-              onPressed: () => _showProfileMessage(
-                context,
-                'Profile search will be available later.',
-              ),
-              icon: const Icon(Icons.search_rounded),
-            ),
-            IconButton(
               tooltip: 'Notifications',
               onPressed: () => _showProfileMessage(
                 context,
@@ -303,7 +463,29 @@ void _showProfileMessage(BuildContext context, String message) {
 }
 
 class _ProfileHeroCard extends StatelessWidget {
-  const _ProfileHeroCard();
+  const _ProfileHeroCard({
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.photoUrl,
+    required this.loading,
+    required this.isUploadingPhoto,
+    required this.isPickingPhoto,
+    required this.photoUploadProgress,
+    required this.onPhotoTap,
+    required this.onEdit,
+  });
+
+  final String name;
+  final String email;
+  final String phone;
+  final String photoUrl;
+  final bool loading;
+  final bool isUploadingPhoto;
+  final bool isPickingPhoto;
+  final double photoUploadProgress;
+  final VoidCallback onPhotoTap;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -329,33 +511,103 @@ class _ProfileHeroCard extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceContainerHighest,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const CircleAvatar(
-                      radius: 42,
-                      backgroundImage: AssetImage(
-                        'assets/stitch/taskflow/images/alexa-profile.jpg',
-                      ),
+                  // Profile image with loading and error handling.
+                  ClipOval(
+                    child: Container(
+                      width: 92,
+                      height: 92,
+                      color: colors.primaryContainer,
+                      child: photoUrl.isEmpty
+                          ? Icon(
+                              Icons.person_rounded,
+                              size: 46,
+                              color: colors.onPrimaryContainer,
+                            )
+                          : Image.network(
+                              photoUrl,
+                              width: 92,
+                              height: 92,
+                              fit: BoxFit.cover,
+                              gaplessPlayback: true,
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+
+                                return Center(
+                                  child: SizedBox(
+                                    width: 26,
+                                    height: 26,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      value: loadingProgress
+                                                  .expectedTotalBytes !=
+                                              null
+                                          ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.person_rounded,
+                                  size: 46,
+                                  color: colors.onPrimaryContainer,
+                                );
+                              },
+                            ),
                     ),
                   ),
-                  Positioned(
-                    bottom: -1,
-                    right: -1,
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: colors.primary,
-                        shape: BoxShape.circle,
+
+                  // Upload progress overlay.
+                  if (isUploadingPhoto)
+                    Positioned.fill(
+                      child: CircleAvatar(
+                        radius: 46,
+                        backgroundColor:
+                            colors.scrim.withValues(alpha: 0.65),
+                        child: SizedBox(
+                          width: 42,
+                          height: 42,
+                          child: CircularProgressIndicator(
+                            value: photoUploadProgress,
+                            strokeWidth: 3,
+                            color: colors.onPrimary,
+                          ),
+                        ),
                       ),
-                      child: Icon(
-                        Icons.edit_rounded,
-                        size: 16,
+                    ),
+
+                  // Camera button.
+                  Positioned(
+                    right: -2,
+                    bottom: -2,
+                    child: Material(
+                      color: colors.primary,
+                      shape: const CircleBorder(),
+                      child: IconButton(
+                        tooltip: 'Change profile photo',
+                        onPressed: isUploadingPhoto || isPickingPhoto
+                            ? null
+                            : onPhotoTap,
+                        icon: const Icon(
+                          Icons.camera_alt_rounded,
+                          size: 17,
+                        ),
                         color: colors.onPrimary,
+                        constraints: const BoxConstraints.tightFor(
+                          width: 32,
+                          height: 32,
+                        ),
+                        padding: EdgeInsets.zero,
                       ),
                     ),
                   ),
@@ -366,68 +618,45 @@ class _ProfileHeroCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Text(
-                          'Alexa Chen',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 9,
-                            vertical: 4,
-                          ),
-                          decoration: ShapeDecoration(
-                            color: colors.primaryContainer,
-                            shape: const StadiumBorder(),
-                          ),
-                          child: Text(
-                            'PRO',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(color: colors.onPrimaryContainer),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
                     Text(
-                      'alexa.chen@flow.design',
+                      name,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: colors.onSurfaceVariant,
                           ),
                     ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.workspace_premium_outlined,
-                          color: colors.primary,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 5),
-                        Flexible(
-                          child: Text(
-                            'TaskFlow Pro • Annual',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(color: colors.primary),
+                    const SizedBox(height: 4),
+                    Text(
+                      phone.isEmpty ? 'Phone: Not set' : phone,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
                           ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: onEdit,
+              icon: const Icon(Icons.edit_rounded, size: 18),
+              label: const Text('Edit profile'),
+            ),
+          ),
+          if (loading) const LinearProgressIndicator(),
+          const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -543,22 +772,18 @@ class _PreferencesCard extends StatelessWidget {
   const _PreferencesCard({
     required this.themeMode,
     required this.notifications,
-    required this.soundAndHaptics,
     required this.defaultPriority,
     required this.onThemeChanged,
     required this.onNotificationsChanged,
-    required this.onSoundChanged,
     required this.onPriorityChanged,
   });
 
   final ThemeMode themeMode;
   final bool notifications;
-  final bool soundAndHaptics;
   final String defaultPriority;
 
   final ValueChanged<ThemeMode> onThemeChanged;
   final ValueChanged<bool> onNotificationsChanged;
-  final ValueChanged<bool> onSoundChanged;
   final ValueChanged<String?> onPriorityChanged;
 
   String get themeModeLabel {
@@ -616,16 +841,6 @@ class _PreferencesCard extends StatelessWidget {
           ),
         ),
         _SettingRow(
-          icon: Icons.vibration_rounded,
-          title: 'Sound & Haptic',
-          subtitle: 'Tactile touch ticks & chimes',
-          trailing: Switch.adaptive(
-            value: soundAndHaptics,
-            onChanged: onSoundChanged,
-            activeTrackColor: colors.primary,
-          ),
-        ),
-        _SettingRow(
           icon: Icons.flag_outlined,
           title: 'Default Priority',
           subtitle: 'Assigned upon fast creation',
@@ -653,12 +868,10 @@ class _IntegrationCard extends StatelessWidget {
   const _IntegrationCard({
     required this.calendarSync,
     required this.onCalendarChanged,
-    required this.onExport,
   });
 
   final bool calendarSync;
   final ValueChanged<bool> onCalendarChanged;
-  final VoidCallback onExport;
 
   @override
   Widget build(BuildContext context) {
@@ -679,12 +892,6 @@ class _IntegrationCard extends StatelessWidget {
             onChanged: onCalendarChanged,
             activeTrackColor: colors.primary,
           ),
-        ),
-        _ActionSettingRow(
-          icon: Icons.download_rounded,
-          title: 'Export Task Archive',
-          subtitle: 'Download all tasks as CSV or JSON',
-          onTap: onExport,
         ),
       ],
     );

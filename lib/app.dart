@@ -3,7 +3,6 @@ import 'providers/auth_provider.dart' as taskflow_auth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'core/theme/taskflow_theme.dart';
 import 'data/repositories/task_repository.dart';
 import 'data/services/notification_service.dart';
@@ -47,7 +46,10 @@ class TaskFlowApp extends StatelessWidget {
           create: (_) => taskflow_auth.AuthProvider(),
         ),
         ChangeNotifierProvider(
-          create: (_) => TaskProvider(),
+          create: (_) => TaskProvider(
+            repository: taskRepository,
+            reminderService: reminderService,
+          ),
         ),
       ],
       child: Consumer<ThemeProvider>(

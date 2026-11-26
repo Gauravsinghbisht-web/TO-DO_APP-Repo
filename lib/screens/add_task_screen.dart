@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../core/theme/taskflow_theme.dart';
 import '../data/models/task.dart';
 import '../providers/task_provider.dart';
 
@@ -88,6 +86,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -235,7 +234,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               top: false,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                color: TaskFlowColors.background,
+                color: colors.surface,
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 720),
@@ -254,10 +253,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             ),
                             style: FilledButton.styleFrom(
                               minimumSize: const Size.fromHeight(56),
-                              backgroundColor: TaskFlowColors.primaryContainer,
-                              textStyle: textTheme.titleLarge?.copyWith(
-                                color: Colors.white,
-                              ),
+                              backgroundColor: colors.primary,
+                              foregroundColor: colors.onPrimary,
+                              textStyle: textTheme.titleLarge,
                             ),
                           ),
                         ),
@@ -268,7 +266,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           child: Text(
                             'Save as Template',
                             style: textTheme.labelLarge?.copyWith(
-                              color: TaskFlowColors.outline,
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -459,7 +457,7 @@ class _AddTaskAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: TaskFlowColors.background,
+    color: Theme.of(context).colorScheme.surface,
     elevation: 1,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -474,12 +472,12 @@ class _AddTaskAppBar extends StatelessWidget {
             width: 30,
             height: 30,
             decoration: BoxDecoration(
-              color: TaskFlowColors.primary,
+              color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(9),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.check_rounded,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               size: 20,
             ),
           ),
@@ -500,13 +498,13 @@ class _AddTaskAppBar extends StatelessWidget {
             ),
             icon: const Icon(Icons.more_vert_rounded),
           ),
-          const CircleAvatar(
+          CircleAvatar(
             radius: 17,
-            backgroundColor: Color(0xFFE3DFFF),
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             child: Icon(
               Icons.person_rounded,
               size: 20,
-              color: TaskFlowColors.primary,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
           const SizedBox(width: 4),
@@ -522,19 +520,23 @@ class _DraftBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: const ShapeDecoration(
-      color: Color(0xFFE9E5FF),
+    decoration: ShapeDecoration(
+      color: Theme.of(context).colorScheme.primaryContainer,
       shape: StadiumBorder(),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.circle, size: 7, color: TaskFlowColors.primary),
+        Icon(
+          Icons.circle,
+          size: 7,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(width: 6),
         Text(
           'Draft',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: TaskFlowColors.primary,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -558,11 +560,11 @@ class _TaskDetailsCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       borderRadius: BorderRadius.circular(20),
       boxShadow: [
         BoxShadow(
-          color: TaskFlowColors.mainText.withValues(alpha: 0.04),
+          color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.08),
           blurRadius: 8,
           offset: const Offset(0, 2),
         ),
@@ -578,14 +580,14 @@ class _TaskDetailsCard extends StatelessWidget {
               margin: const EdgeInsets.only(top: 7),
               width: 28,
               height: 28,
-              decoration: const BoxDecoration(
-                color: TaskFlowColors.lavenderContainer,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.check_circle_rounded,
                 size: 19,
-                color: TaskFlowColors.primaryContainer,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(width: 10),
@@ -621,7 +623,7 @@ class _TaskDetailsCard extends StatelessWidget {
             maxLines: 4,
             textCapitalization: TextCapitalization.sentences,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: TaskFlowColors.secondaryText,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             decoration: const InputDecoration(
               hintText: 'Add notes, checklists, or project details...',
@@ -666,16 +668,16 @@ class _TaskDetailsCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: TaskFlowColors.outline,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
+                Icon(
                   Icons.attach_file_rounded,
-                  color: TaskFlowColors.outline,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -701,7 +703,7 @@ class _SectionLabel extends StatelessWidget {
           child: Text(
             title.toUpperCase(),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: TaskFlowColors.secondaryText,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               letterSpacing: 1,
             ),
           ),
@@ -711,7 +713,7 @@ class _SectionLabel extends StatelessWidget {
             trailing!,
             style: Theme.of(
               context,
-            ).textTheme.labelSmall?.copyWith(color: TaskFlowColors.primary),
+            ).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.primary),
           ),
       ],
     ),
@@ -748,7 +750,7 @@ class _CategoryPicker extends StatelessWidget {
           onPressed: onAddCustom,
           avatar: const Icon(Icons.add_rounded, size: 18),
           label: const Text('Custom'),
-          backgroundColor: const Color(0xFFE9E5FF),
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           side: BorderSide.none,
         ),
       ],
@@ -772,10 +774,12 @@ class _CategoryChip extends StatelessWidget {
     label: Text(label),
     selected: selected,
     onSelected: (_) => onTap(),
-    selectedColor: TaskFlowColors.primary,
-    backgroundColor: const Color(0xFFEFEBFF),
+    selectedColor: Theme.of(context).colorScheme.primary,
+    backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
     labelStyle: TextStyle(
-      color: selected ? Colors.white : TaskFlowColors.secondaryText,
+      color: selected
+          ? Theme.of(context).colorScheme.onPrimary
+          : Theme.of(context).colorScheme.onSurfaceVariant,
       fontWeight: FontWeight.w500,
     ),
     side: BorderSide.none,
@@ -800,7 +804,7 @@ class _PriorityPicker extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: TaskFlowColors.lavenderContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -811,7 +815,7 @@ class _PriorityPicker extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: Material(
                   color: selected == priority.$1
-                      ? Colors.white
+                      ? Theme.of(context).colorScheme.surfaceContainerHighest
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(14),
                   child: InkWell(
@@ -837,7 +841,7 @@ class _PriorityPicker extends StatelessWidget {
                                 ?.copyWith(
                                   color: selected == priority.$1
                                       ? priority.$3
-                                      : TaskFlowColors.secondaryText,
+                                      : Theme.of(context).colorScheme.onSurfaceVariant,
                                 ),
                           ),
                         ],
@@ -868,7 +872,7 @@ class _DateTimeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    color: Theme.of(context).colorScheme.surfaceContainerLow,
     borderRadius: BorderRadius.circular(18),
     child: InkWell(
       onTap: onTap,
@@ -881,10 +885,10 @@ class _DateTimeField extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: TaskFlowColors.lavenderContainer,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: TaskFlowColors.primary),
+              child: Icon(icon, color: Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -894,7 +898,7 @@ class _DateTimeField extends StatelessWidget {
                   Text(
                     label,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: TaskFlowColors.outline,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -926,7 +930,7 @@ class _ReminderRepeatCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
@@ -945,10 +949,10 @@ class _ReminderRepeatCard extends StatelessWidget {
           trailing: Switch.adaptive(
             value: reminderEnabled,
             onChanged: onReminderChanged,
-            activeTrackColor: TaskFlowColors.primary,
+            activeTrackColor: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const Divider(height: 1, color: TaskFlowColors.lavenderContainer),
+        Divider(height: 1, color: Theme.of(context).dividerColor),
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: const _SettingsIcon(icon: Icons.repeat_rounded),
@@ -987,10 +991,10 @@ class _SettingsIcon extends StatelessWidget {
     width: 44,
     height: 44,
     decoration: BoxDecoration(
-      color: TaskFlowColors.lavenderContainer,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(13),
     ),
-    child: Icon(icon, color: TaskFlowColors.primary),
+    child: Icon(icon, color: Theme.of(context).colorScheme.primary),
   );
 }
 
@@ -1013,7 +1017,7 @@ class _SubtasksCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
@@ -1025,7 +1029,7 @@ class _SubtasksCard extends StatelessWidget {
                 value: subtask.done,
                 onChanged: (value) => onToggle(subtask, value ?? false),
                 shape: const CircleBorder(),
-                activeColor: TaskFlowColors.tertiary,
+                activeColor: Theme.of(context).colorScheme.tertiary,
               ),
               Expanded(
                 child: Text(
@@ -1035,17 +1039,17 @@ class _SubtasksCard extends StatelessWidget {
                         ? TextDecoration.lineThrough
                         : null,
                     color: subtask.done
-                        ? TaskFlowColors.outline
-                        : TaskFlowColors.mainText,
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
               IconButton(
                 tooltip: 'Remove subtask',
                 onPressed: () => onRemove(subtask),
-                icon: const Icon(
+                icon: Icon(
                   Icons.close_rounded,
-                  color: TaskFlowColors.outline,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -1087,7 +1091,7 @@ class _EstimateCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     decoration: BoxDecoration(
-      color: const Color(0xFFE9E5FF),
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
@@ -1095,11 +1099,11 @@ class _EstimateCard extends StatelessWidget {
         Container(
           width: 44,
           height: 44,
-          decoration: const BoxDecoration(
-            color: TaskFlowColors.primary,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.auto_awesome_rounded, color: Colors.white),
+          child: Icon(Icons.auto_awesome_rounded, color: Theme.of(context).colorScheme.onPrimary),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1110,7 +1114,7 @@ class _EstimateCard extends StatelessWidget {
                 'Estimated time',
                 style: Theme.of(
                   context,
-                ).textTheme.labelLarge?.copyWith(color: TaskFlowColors.primary),
+                ).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary),
               ),
               Text(
                 '$minutes min focus block',

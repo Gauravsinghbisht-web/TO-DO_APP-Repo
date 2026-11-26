@@ -2,7 +2,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../models/task.dart';
 
 class FirestoreService {
@@ -43,13 +42,41 @@ class FirestoreService {
   Future<void> saveUserProfile({
     required String name,
     required String email,
+    String phone = '',
+    String photoUrl = '',
   }) async {
     final profile = await _userDocument.get();
+    final existingData = profile.data() ?? <String, dynamic>{};
 
     await _userDocument.set({
+      'uid': _userId,
+      'name': existingData['name'] ?? name,
+      'email': existingData['email'] ?? email,
+      'phone': existingData['phone'] ?? phone,
+      'photoUrl': existingData['photoUrl'] ?? photoUrl,
+      if (existingData['createdAt'] == null)
+        'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  // Update editable fields while preserving the rest of the user document.
+  Future<void> updateUserProfile({
+    required String name,
+    required String phone,
+  }) async {
+    await _userDocument.set({
+      'uid': _userId,
       'name': name,
-      'email': email,
-      if (!profile.exists) 'createdAt': FieldValue.serverTimestamp(),
+      'phone': phone,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> updateUserProfilePhoto(String photoUrl) async {
+    await _userDocument.set({
+      'uid': _userId,
+      'photoUrl': photoUrl,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
   }

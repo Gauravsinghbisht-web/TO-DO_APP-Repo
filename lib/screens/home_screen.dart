@@ -8,6 +8,7 @@ import '../widgets/taskflow_bottom_navigation_bar.dart';
 import '../widgets/taskflow_empty_state.dart';
 import 'add_task_screen.dart';
 import 'calendar_screen.dart';
+import 'notification_screen.dart';
 import 'profile_screen.dart';
 import 'statistics_screen.dart';
 import 'tasks_screen.dart';
@@ -41,6 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _openNotifications() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => const NotificationScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final titles = [
@@ -61,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _searchOpen = !_searchOpen;
                 if (!_searchOpen) _searchController.clear();
               }),
-              onNotifications: () => _showInfo('You are all caught up!'),
+              onNotifications: _openNotifications,
               onProfile: _openProfile,
             ),
             Expanded(
@@ -437,6 +446,8 @@ class _DashboardAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final auth = context.watch<AuthProvider>();
+    final profilePhotoUrl = auth.profile?['photoUrl'] as String?;
 
     return Material(
       color: scheme.surface,
@@ -501,15 +512,12 @@ class _DashboardAppBar extends StatelessWidget {
                 radius: 21,
                 backgroundColor: scheme.primaryContainer,
                 child: ClipOval(
-                  child: Image.asset(
-                    'assets/stitch/taskflow/images/alexa-profile.jpg',
+                  child: _profileImage(
+                    profilePhotoUrl,
                     width: 38,
                     height: 38,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => Icon(
-                      Icons.person_rounded,
-                      color: scheme.onPrimaryContainer,
-                    ),
+                    fallback: 'assets/stitch/taskflow/images/alexa-profile.jpg',
+                    fallbackColor: scheme.onPrimaryContainer,
                   ),
                 ),
               ),
@@ -533,9 +541,13 @@ class _GreetingHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final user = context.watch<AuthProvider>().user;
+    final auth = context.watch<AuthProvider>();
+    final user = auth.user;
 
-    final userName = user?.displayName?.trim().isNotEmpty == true
+    final profileName = auth.profile?['name'] as String?;
+    final userName = profileName?.trim().isNotEmpty == true
+        ? profileName!.trim()
+        : user?.displayName?.trim().isNotEmpty == true
         ? user!.displayName!.trim()
         : 'User';
 
@@ -588,16 +600,17 @@ class _GreetingHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const _ProfileAvatar(radius: 28),
+        _ProfileAvatar(radius: 28, photoUrl: auth.profile?['photoUrl'] as String?),
       ],
     );
   }
 }
 
 class _ProfileAvatar extends StatelessWidget {
-  const _ProfileAvatar({required this.radius});
+  const _ProfileAvatar({required this.radius, this.photoUrl});
 
   final double radius;
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -612,13 +625,50 @@ class _ProfileAvatar extends StatelessWidget {
       child: CircleAvatar(
         radius: radius,
         backgroundColor: scheme.surfaceContainerHighest,
-        backgroundImage: const AssetImage(
-          'assets/stitch/taskflow/images/alexa-dashboard.jpg',
+        child: ClipOval(
+          child: _profileImage(
+            photoUrl,
+            width: radius * 2,
+            height: radius * 2,
+            fallback: 'assets/stitch/taskflow/images/alexa-dashboard.jpg',
+            fallbackColor: scheme.onSurfaceVariant,
+          ),
         ),
-        onBackgroundImageError: (_, _) {},
       ),
     );
   }
+}
+
+Widget _profileImage(
+  String? photoUrl, {
+  required double width,
+  required double height,
+  required String fallback,
+  required Color fallbackColor,
+}) {
+  final url = photoUrl?.trim() ?? '';
+  if (url.isNotEmpty) {
+    return Image.network(
+      url,
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => Image.asset(
+        fallback,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => Icon(Icons.person_rounded, color: fallbackColor),
+      ),
+    );
+  }
+  return Image.asset(
+    fallback,
+    width: width,
+    height: height,
+    fit: BoxFit.cover,
+    errorBuilder: (_, _, _) => Icon(Icons.person_rounded, color: fallbackColor),
+  );
 }
 
 class _DailyProgressCard extends StatelessWidget {
